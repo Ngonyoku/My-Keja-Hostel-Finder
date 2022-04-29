@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/landlordInformationView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:clickable="true"
+    android:visibility="gone"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="4dp"
+    app:contentPadding="8dp"
+    app:strokeColor="@color/black"
+    app:strokeWidth="0.5dp"
+    tools:visibility="visible">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/landlordProfileImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/landLordNameTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="@font/abril_fatface"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textSize="25sp"
+            app:layout_constraintBottom_toBottomOf="@+id/landlordProfileImage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/landlordProfileImage"
+            app:layout_constraintTop_toTopOf="@+id/landlordProfileImage"
+            tools:text="Name of landlord/caretaker" />
+
+        <Button
+            android:id="@+id/buttonCall"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:drawableLeft="@drawable/ic_call"
+            android:drawableTint="@color/white"
+
+            android:text="call"
+            app:layout_constraintEnd_toEndOf="@+id/landLordNameTV"
+            app:layout_constraintStart_toStartOf="@+id/landlordProfileImage"
+            app:layout_constraintTop_toBottomOf="@+id/landLordNameTV" />
+
+        <Button
+            android:id="@+id/buttonEmail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FF1313"
+            android:drawableLeft="@drawable/ic_email"
+            android:drawableTint="@color/white"
+            android:text="email"
+            app:layout_constraintEnd_toEndOf="@+id/buttonCall"
+            app:layout_constraintStart_toStartOf="@+id/buttonCall"
+            app:layout_constraintTop_toBottomOf="@+id/buttonCall" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

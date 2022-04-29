@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/drawable/ic_home.xml" value="0.1805" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/drawable/ic_wave.xml" value="0.1805" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/drawable/wave_ui.xml" value="0.1805" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout-night/activity_main.xml" value="0.184375" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout-night/fragment_home.xml" value="0.184375" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/activity_hostel_details.xml" value="0.22" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/activity_image_sider.xml" value="0.184375" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/activity_main.xml" value="0.184375" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/activity_splash_screen.xml" value="0.184375" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/fragment_book_mark.xml" value="0.1703125" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/fragment_home.xml" value="0.22" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/fragment_map_search.xml" value="0.184375" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/item_hostel.xml" value="0.22" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/item_hostel_image.xml" value="0.184375" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/item_hostel_map.xml" value="0.184375" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/layout_hostel_details.xml" value="0.22" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/layout_landlord_infomation.xml" value="0.184375" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/menu/bottom_navigation_menu.xml" value="0.184375" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/menu/hostel_details_menu.xml" value="0.184375" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
