@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -30,6 +31,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -38,6 +40,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.kbanda_projects.mykeja.HostelDetailsActivity;
 import com.kbanda_projects.mykeja.R;
 import com.kbanda_projects.mykeja.models.Hostel;
 
@@ -63,7 +66,18 @@ public class MapSearchFragment extends Fragment {
         public void onMapReady(GoogleMap googleMap) {
             map = googleMap;
 //            map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-            checkLocationPermissions();
+            checkLocationPermissions(googleMap);
+            map
+                    .setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(@NonNull Marker marker) {
+                            Intent intent = new Intent(requireActivity(), HostelDetailsActivity.class);
+                            Hostel selectedHostel = (Hostel) marker.getTag();
+                            intent.putExtra("currentHostel", selectedHostel);
+                            requireActivity().startActivity(intent);
+                            return false;
+                        }
+                    });
         }
     };
 
@@ -91,13 +105,13 @@ public class MapSearchFragment extends Fragment {
     }
 
     @AfterPermissionGranted(REQUEST_CODE_MAPS_PERMISSIONS)
-    private void checkLocationPermissions() {
+    private void checkLocationPermissions(GoogleMap googleMap) {
         String[] permissions = {
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION
         };
         if (EasyPermissions.hasPermissions(requireActivity(), permissions)) {
-            getUserCurrentLocation();
+            getUserCurrentLocation(googleMap);
         } else {
             EasyPermissions
                     .requestPermissions(
@@ -113,7 +127,7 @@ public class MapSearchFragment extends Fragment {
      * Check to see the user's current location
      * */
     @SuppressLint("MissingPermission")
-    private void getUserCurrentLocation() {
+    private void getUserCurrentLocation(GoogleMap googleMap) {
         LocationManager locationManager = (LocationManager)
                 requireActivity().getSystemService(Context.LOCATION_SERVICE);
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -129,6 +143,7 @@ public class MapSearchFragment extends Fragment {
                             if (location != null) {
                                 //Display the user location on map
                                 displayCurrentLocation(
+                                        googleMap,
                                         location.getLatitude(),
                                         location.getLongitude()
                                 );
@@ -145,6 +160,7 @@ public class MapSearchFragment extends Fragment {
                                         super.onLocationResult(locationResult);
                                         Location location1 = locationResult.getLastLocation();
                                         displayCurrentLocation(
+                                                googleMap,
                                                 location1.getLatitude(),
                                                 location1.getLongitude()
                                         );
@@ -224,6 +240,9 @@ public class MapSearchFragment extends Fragment {
         ;
     }
 
+    /*
+     * Display the hostels on map view
+     * */
     private void showHostelOnMap(Hostel hostel) {
         if (map != null) {
             Log.d(TAG, "showHostelOnMap: Hostel -> " + hostel.toString());
@@ -235,24 +254,26 @@ public class MapSearchFragment extends Fragment {
             if (latitude != null && longitude != null) {
                 LatLng location = new LatLng(Double.valueOf(latitude), Double.valueOf(longitude));
                 MarkerOptions markerOptions = new MarkerOptions().position(location).title(title);
-                map.addMarker(markerOptions);
+                Marker marker = map.addMarker(markerOptions);
+                assert marker != null;
+                marker.setTag(hostel);
             }
         }
     }
 
-    private void displayCurrentLocation(double latitude, double longitude) {
-        if (map != null) {
+    /*
+     * Where the user is currently located at
+     * */
+    private void displayCurrentLocation(GoogleMap googleMap, double latitude, double longitude) {
+        if (googleMap != null) {
             LatLng userLocation = new LatLng(latitude, longitude);
-            map.addMarker(new MarkerOptions()
+            googleMap.addMarker(new MarkerOptions()
                     .position(userLocation)
                     .title("Your current location")
                     .snippet("This is where you are at right now")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
             );
-//            map.setMinZoomPreference(6.0f);
-//            map.setMaxZoomPreference(14.0f);
-//            map.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(latitude, longitude),
                     10
             ));

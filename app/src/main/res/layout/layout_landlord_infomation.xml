@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:clickable="true"
+    android:focusable="true"
     android:visibility="gone"
     app:cardCornerRadius="4dp"
     app:cardElevation="4dp"
@@ -21,14 +22,15 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/landlordProfileImage"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:scaleType="centerCrop"
+            android:src="@drawable/ic_user_placeholder"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
+            tools:src="@drawable/ic_user_placeholder" />
 
         <TextView
             android:id="@+id/landLordNameTV"
@@ -51,23 +53,38 @@
             android:id="@+id/buttonCall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/purple_500"
+            android:layout_marginTop="8dp"
             android:drawableLeft="@drawable/ic_call"
             android:drawableTint="@color/white"
-
             android:text="call"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="@+id/landLordNameTV"
             app:layout_constraintStart_toStartOf="@+id/landlordProfileImage"
-            app:layout_constraintTop_toBottomOf="@+id/landLordNameTV" />
+            app:layout_constraintTop_toBottomOf="@+id/landlordProfileImage" />
+
+        <!--        <Button-->
+        <!--            android:id="@+id/buttonEmail"-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:backgroundTint="#FF1313"-->
+        <!--            android:drawableLeft="@drawable/ic_email"-->
+        <!--            android:drawableTint="@color/white"-->
+        <!--            android:text="email"-->
+        <!--            android:textColor="@color/white"-->
+        <!--            app:layout_constraintEnd_toEndOf="@+id/buttonCall"-->
+        <!--            app:layout_constraintStart_toStartOf="@+id/buttonCall"-->
+        <!--            app:layout_constraintTop_toBottomOf="@+id/buttonCall" />-->
 
         <Button
-            android:id="@+id/buttonEmail"
+            android:id="@+id/buttonWhatsApp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:backgroundTint="#FF1313"
-            android:drawableLeft="@drawable/ic_email"
+            android:backgroundTint="@color/whatsapp_green"
+            android:drawableLeft="@drawable/ic_whatsapp"
             android:drawableTint="@color/white"
-            android:text="email"
+            android:text="WhatsApp"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="@+id/buttonCall"
             app:layout_constraintStart_toStartOf="@+id/buttonCall"
             app:layout_constraintTop_toBottomOf="@+id/buttonCall" />

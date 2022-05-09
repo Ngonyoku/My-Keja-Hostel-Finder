@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary"
+            app:contentScrim="?attr/colorPrimaryDark"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/toolbar">
 
@@ -32,10 +32,11 @@
                 tools:listitem="@layout/item_hostel_image" />
 
             <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
+                android:id="@+id/hostelDetailsToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@android:color/transparent" />
+                android:background="@android:color/transparent"
+                app:menu="@menu/hostel_details_menu" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -73,34 +74,54 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 tools:text="Ksh. 2500 p/m" />
 
-            <LinearLayout
+            <com.google.android.material.chip.ChipGroup
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2">
+                android:layout_height="match_parent"
+                android:singleLine="true">
 
-                <RatingBar
-                    android:id="@+id/ratingBar"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/roomTypeChip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_weight="1"
-                    android:scaleX="0.5"
-                    android:scaleY="0.5"
-                    android:textAppearance="?attr/textAppearanceBody2"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:transformPivotX="0dp" />
+                    app:chipIcon="@drawable/ic_home"
+                    tools:text="Apartment" />
 
-                <TextView
-                    android:id="@+id/ratingsCountTV"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/parkingChip"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center|start"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textStyle="bold"
-                    tools:text="4.2" />
-            </LinearLayout>
+                    android:layout_height="wrap_content"
+                    android:text="parking"
+                    android:visibility="gone"
+                    app:chipIcon="@drawable/ic_car"
+                    tools:visibility="visible" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/wifiChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="has wifi"
+                    android:visibility="gone"
+                    app:chipIcon="@drawable/ic_wifi"
+                    tools:visibility="visible" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/numberOfRoomsChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="3 Rooms available" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <TextView
+                android:id="@+id/ratingsCountTV"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:drawableLeft="@drawable/ic_ratings_star"
+                android:drawableTint="@color/teal_200"
+                android:gravity="center|start"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@color/teal_200"
+                android:textStyle="bold"
+                tools:text="4.2" />
 
             <TextView
                 android:id="@+id/hostelDescriptionTV"

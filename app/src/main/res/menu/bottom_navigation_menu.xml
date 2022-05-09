@@ -12,9 +12,9 @@
         android:icon="@drawable/ic_map"
         android:title="Find Hostel"
         app:showAsAction="always|withText" />
-    <item
-        android:id="@+id/bookMarkFragment"
-        android:icon="@drawable/ic_ookmark"
-        android:title="Bookmarks"
-        app:showAsAction="always|withText" />
+<!--    <item-->
+    <!--        android:id="@+id/bookMarkFragment"-->
+    <!--        android:icon="@drawable/ic_ookmark"-->
+    <!--        android:title="Bookmarks"-->
+    <!--        app:showAsAction="always|withText" />-->
 </menu>

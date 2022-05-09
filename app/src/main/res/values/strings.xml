@@ -6,4 +6,7 @@
     <string name="weclient_id">29510321313-ptvf82eke9h92j9oelko855443ubklhu.apps.googleusercontent.com</string>
     <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur delectus eaque neque, praesentium quis temporibus. Aperiam asperiores illum in ipsam iure minus non officiis totam! Ad asperiores atque inventore maiores.</string>
     <string name="no_vacancy">No Vacancy</string>
+    <string name="first_name">First Name</string>
+    <string name="email">Email</string>
+    <string name="last_name">Last Name</string>
 </resources>

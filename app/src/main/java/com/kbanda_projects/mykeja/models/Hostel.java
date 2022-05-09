@@ -5,13 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Hostel implements Serializable {
-    private String description;
-    private boolean hasField;
-    private boolean hasParking;
-    private boolean hasWifi;
-    private List<String> imageUrls;
-    private boolean isVacant;
-    private Map<String, String> locationInfo;
     private String name;
     private String ownerId;
     private String propertyType;
@@ -20,6 +13,13 @@ public class Hostel implements Serializable {
     private String roomType;
     private List<String> tags;
     private String totalRoomsAvailable;
+    private String description;
+    private boolean hasField;
+    private boolean hasParking;
+    private boolean hasWifi;
+    private List<String> imageUrls;
+    private boolean isVacant;
+    private Map<String, String> locationInfo;
 
     public Hostel(
             String description,

@@ -1,18 +1,35 @@
 package com.kbanda_projects.mykeja.models;
 
-public class User {
-    private String userId;
-    private String role;
+import java.io.Serializable;
+
+public class User implements Serializable {
+    private String userId = "";
+    private String role = "USER"; //USER, LANDLORD, ADMIN
     private String profileImageUrl;
-    private String firstName;
-    private String lastName;
+    private String firstName = "";
+    private String lastName = "";
     private String email;
     private String phoneNumber;
 
-    public User(String userId, String role, String profileImageUrl, String firstName, String lastName, String email, String phoneNumber) {
+    public User(
+            String userId,
+            String role,
+            String profileImageUrl,
+            String firstName,
+            String lastName,
+            String email,
+            String phoneNumber
+    ) {
         this.userId = userId;
         this.role = role;
         this.profileImageUrl = profileImageUrl;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public User(String firstName, String lastName, String email, String phoneNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
