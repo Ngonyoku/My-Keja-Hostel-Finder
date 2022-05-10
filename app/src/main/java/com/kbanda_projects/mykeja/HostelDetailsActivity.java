@@ -10,12 +10,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.material.chip.Chip;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.kbanda_projects.mykeja.adapters.HostelImagesRecyclerViewAdapter;
 import com.kbanda_projects.mykeja.models.Hostel;
@@ -32,6 +35,7 @@ public class HostelDetailsActivity extends AppCompatActivity {
     private static final String TAG = "HostelDetailsActivity";
     public static final int REQUEST_CODE_CALL = 923;
     private FirebaseAuth firebaseAuth;
+    private FirebaseUser currentUser;
     private FirebaseFirestore firestore;
 
     private TextView nameOfHostelTV;
@@ -53,6 +57,7 @@ public class HostelDetailsActivity extends AppCompatActivity {
     private List<String> hostelImagesList;
 
     private String landLordPhoneNumber = null;
+    private Hostel currentHostelObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +69,7 @@ public class HostelDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        currentUser = firebaseAuth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
 
         hostelImagesList = new ArrayList<>();
@@ -89,12 +95,21 @@ public class HostelDetailsActivity extends AppCompatActivity {
         imagesRecyclerView.setHasFixedSize(true);
 
         imagesRecyclerView.setAdapter(imagesRecyclerViewAdapter);
+        invalidateOptionsMenu();
 
         if (getIntent().getExtras() != null) {
             Hostel currentHostelFromIntent = (Hostel) getIntent().getSerializableExtra("currentHostel");
-
+            currentHostelObject = currentHostelFromIntent;
             loadHostelInformation(currentHostelFromIntent);
             getUserInformationFromFirebase(currentHostelFromIntent);
+
+            imagesRecyclerViewAdapter
+                    .setOnHostelImageClickedListener(imagePosition -> {
+                        Intent intent = new Intent(this, ImageSliderActivity.class);
+                        intent.putExtra("hostelImages", (Serializable) hostelImagesList);
+                        startActivity(intent);
+                    })
+            ;
         }
         buttonCallLandLord
                 .setOnClickListener(v -> {
@@ -106,6 +121,41 @@ public class HostelDetailsActivity extends AppCompatActivity {
                     whatsAppLandLord();
                 })
         ;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.hostel_details_menu, menu);
+        MenuItem actionEditHostel = menu.findItem(R.id.actionEditHostel);
+        if (currentUser != null) {
+            if (actionEditHostel != null)
+                if (currentHostelObject != null) {
+                    if (currentHostelObject.getOwnerId().equals(currentUser.getUid())) {
+                        actionEditHostel.setVisible(true);
+                    } else {
+                        actionEditHostel.setVisible(false);
+                    }
+                }
+        } else {
+            actionEditHostel.setVisible(false);
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    //TODO: Hide the edit button
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.actionEditHostel: {
+                Intent intent = new Intent(this, AdminAddEditHostel.class);
+                intent.putExtra("currentHostel", currentHostelObject);
+                startActivity(intent);
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 
     @AfterPermissionGranted(REQUEST_CODE_CALL)
@@ -159,8 +209,6 @@ public class HostelDetailsActivity extends AppCompatActivity {
     }
 
     private void loadHostelInformation(Hostel hostel) {
-        boolean hasParking = hostel.isHasParking();
-        boolean hasWifi = hostel.isHasWifi();
         String rent = "Ksh. " + hostel.getRentPricePerMonth() + " per month";
 
         nameOfHostelTV.setText(hostel.getName());
@@ -171,19 +219,17 @@ public class HostelDetailsActivity extends AppCompatActivity {
         String totalRoomsAvailable = hostel.getTotalRoomsAvailable() + " rooms available";
         numberOfRooms.setText(totalRoomsAvailable);
 
+        boolean hasParking = hostel.isHasParking();
+        boolean hasWifi = hostel.isHasWifi();
+
         if (hasParking) parking.setVisibility(View.VISIBLE);
-        if (hasWifi) parking.setVisibility(View.VISIBLE);
+        if (hasWifi) wifi.setVisibility(View.VISIBLE);
 
-        hostelImagesList.clear();
-        hostelImagesList.addAll(hostel.getImageUrls());
-        imagesRecyclerViewAdapter.notifyDataSetChanged();
-
-        imagesRecyclerViewAdapter
-                .setOnHostelImageClickedListener(imagePosition -> {
-                    Intent intent = new Intent(this, ImageSliderActivity.class);
-                    intent.putExtra("hostelImages", (Serializable) hostelImagesList);
-                    startActivity(intent);
-                });
+        if (hostel.getImageUrls() != null) {
+            hostelImagesList.clear();
+            hostelImagesList.addAll(hostel.getImageUrls());
+            imagesRecyclerViewAdapter.notifyDataSetChanged();
+        }
     }
 
     private void getUserInformationFromFirebase(Hostel hostelInformation) {

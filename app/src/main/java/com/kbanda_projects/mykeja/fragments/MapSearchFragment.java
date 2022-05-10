@@ -143,7 +143,6 @@ public class MapSearchFragment extends Fragment {
                             if (location != null) {
                                 //Display the user location on map
                                 displayCurrentLocation(
-                                        googleMap,
                                         location.getLatitude(),
                                         location.getLongitude()
                                 );
@@ -160,7 +159,6 @@ public class MapSearchFragment extends Fragment {
                                         super.onLocationResult(locationResult);
                                         Location location1 = locationResult.getLastLocation();
                                         displayCurrentLocation(
-                                                googleMap,
                                                 location1.getLatitude(),
                                                 location1.getLongitude()
                                         );
@@ -174,7 +172,7 @@ public class MapSearchFragment extends Fragment {
                                         )
                                 ;
                             }
-                            fetchHostelsFromDatabase();
+                            fetchHostelsFromDatabase(googleMap);
                         }
                     });
         } else {
@@ -209,11 +207,11 @@ public class MapSearchFragment extends Fragment {
         ;
     }
 
-    private void fetchHostelsFromDatabase() {
+    private void fetchHostelsFromDatabase(GoogleMap googleMap) {
         Log.d(TAG, "fetchHostelsFromDatabase: Fetching hostels from database");
         firebaseFirestore
                 .collection("Hostels")
-                .whereEqualTo("isVacant", true)
+                .whereEqualTo("vacant", true)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -228,9 +226,8 @@ public class MapSearchFragment extends Fragment {
                             for (DocumentChange documentChange : value.getDocumentChanges()) {
                                 Hostel hostel = documentChange.getDocument().toObject(Hostel.class);
                                 hostelList.add(hostel);
-                                showHostelOnMap(hostel);
-//                                recyclerViewAdapter.notifyDataSetChanged();
                                 Log.d(TAG, "onEvent: Documents -> " + hostel);
+                                showHostelOnMap(googleMap, hostel);
                             }
                         } else {
                             Log.d(TAG, "onEvent: No listings available");
@@ -243,8 +240,9 @@ public class MapSearchFragment extends Fragment {
     /*
      * Display the hostels on map view
      * */
-    private void showHostelOnMap(Hostel hostel) {
+    private void showHostelOnMap(GoogleMap googleMap, Hostel hostel) {
         if (map != null) {
+
             Log.d(TAG, "showHostelOnMap: Hostel -> " + hostel.toString());
             Map<String, String> locationInfo = hostel.getLocationInfo();
             String latitude = locationInfo.get("latitude");
@@ -252,28 +250,32 @@ public class MapSearchFragment extends Fragment {
             String title = hostel.getName();
 
             if (latitude != null && longitude != null) {
+                Log.d(TAG, "showHostelOnMap: Adding markers to map");
                 LatLng location = new LatLng(Double.valueOf(latitude), Double.valueOf(longitude));
-                MarkerOptions markerOptions = new MarkerOptions().position(location).title(title);
-                Marker marker = map.addMarker(markerOptions);
+                Marker marker = googleMap.addMarker(
+                        new MarkerOptions().position(location).title(title)
+                );
                 assert marker != null;
                 marker.setTag(hostel);
             }
+
         }
     }
 
     /*
      * Where the user is currently located at
      * */
-    private void displayCurrentLocation(GoogleMap googleMap, double latitude, double longitude) {
-        if (googleMap != null) {
+    private void displayCurrentLocation(double latitude, double longitude) {
+        if (map != null) {
             LatLng userLocation = new LatLng(latitude, longitude);
-            googleMap.addMarker(new MarkerOptions()
-                    .position(userLocation)
-                    .title("Your current location")
-                    .snippet("This is where you are at right now")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
-            );
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+//            MarkerOptions your_current_location = new MarkerOptions()
+//                    .position(userLocation)
+//                    .title("Your current location")
+//                    .snippet("This is where you are at right now")
+//                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
+//            map.addMarker(your_current_location
+//            );
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(latitude, longitude),
                     10
             ));

@@ -1,24 +1,25 @@
 package com.kbanda_projects.mykeja.models;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class Hostel implements Serializable {
-    private String name;
-    private String ownerId;
-    private String propertyType;
-    private String ratings;
-    private String rentPricePerMonth;
-    private String roomType;
+    private String name = "";
+    private String ownerId = "";
+    private String propertyType = "Apartment";
+    private String ratings = "0";
+    private String rentPricePerMonth = "";
+    private String roomType = "Single room"; //Self-contained, single room
     private List<String> tags;
-    private String totalRoomsAvailable;
-    private String description;
+    private String totalRoomsAvailable = "0";
+    private String description = "";
     private boolean hasField;
     private boolean hasParking;
     private boolean hasWifi;
-    private List<String> imageUrls;
-    private boolean isVacant;
+    private List<String> imageUrls = Arrays.asList();
+    private boolean isVacant = true;
     private Map<String, String> locationInfo;
 
     public Hostel(

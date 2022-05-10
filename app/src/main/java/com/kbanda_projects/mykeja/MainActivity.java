@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
             new AuthUI.IdpConfig.GoogleBuilder().build()
     );
 
-    private HomeFragment homeFragment = new HomeFragment();
+    private HomeFragment homeFragment;
     private BookMarkFragment bookMarkFragment;
     public static final int RC_SIGN_IN = 145;
 
@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
         bookMarkFragment = new BookMarkFragment();
+        homeFragment = new HomeFragment();
         replaceFragment(homeFragment);
 
         activityMainBinding

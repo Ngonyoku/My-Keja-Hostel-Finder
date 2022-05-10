@@ -148,7 +148,7 @@ public class HomeFragment extends Fragment {
                                 if (imageUrl != null) {
                                     if (!imageUrl.isEmpty()) {
                                         Glide
-                                                .with(requireActivity())
+                                                .with(getContext())
                                                 .load(imageUrl)
                                                 .centerCrop()
                                                 .into(userProfileImage)
@@ -229,7 +229,7 @@ public class HomeFragment extends Fragment {
         Log.d(TAG, "fetchHostelsFromDatabase: Fetching results");
         firebaseFirestore
                 .collection("Hostels")
-                .whereEqualTo("isVacant", true)
+                .whereEqualTo("vacant", true)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {

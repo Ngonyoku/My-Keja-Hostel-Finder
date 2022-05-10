@@ -78,16 +78,17 @@ public class HostelRecyclerViewAdapter extends RecyclerView.Adapter<HostelRecycl
         holder
                 .numberOfRooms
                 .setText(totalRoomsAvailable);
-
-        String imageUrl = currentHostel.getImageUrls().get(0);
-        if (imageUrl != null) {
-            Glide
-                    .with(context)
-                    .load(imageUrl)
-                    .centerCrop()
-                    .placeholder(R.color.teal_700)
-                    .into(holder.hostelFirstImage)
-            ;
+        if (currentHostel.getImageUrls() != null && !currentHostel.getImageUrls().isEmpty()) {
+            String imageUrl = currentHostel.getImageUrls().get(0);
+            if (imageUrl != null) {
+                Glide
+                        .with(context)
+                        .load(imageUrl)
+                        .centerCrop()
+                        .placeholder(R.color.teal_700)
+                        .into(holder.hostelFirstImage)
+                ;
+            }
         }
     }
 
