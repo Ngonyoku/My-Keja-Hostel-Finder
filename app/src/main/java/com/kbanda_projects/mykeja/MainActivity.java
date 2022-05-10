@@ -59,10 +59,10 @@ public class MainActivity extends AppCompatActivity {
                             replaceFragment(new MapSearchFragment());
                             break;
                         }
-//                        case R.id.bookMarkFragment: {
-//                            replaceFragment(bookMarkFragment);
-//                            break;
-//                        }
+                        case R.id.bookMarkFragment: {
+                            replaceFragment(bookMarkFragment);
+                            break;
+                        }
                     }
                     return true;
                 })

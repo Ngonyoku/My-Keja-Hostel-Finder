@@ -47,6 +47,7 @@ import com.kbanda_projects.mykeja.models.Hostel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -245,20 +246,25 @@ public class MapSearchFragment extends Fragment {
 
             Log.d(TAG, "showHostelOnMap: Hostel -> " + hostel.toString());
             Map<String, String> locationInfo = hostel.getLocationInfo();
-            String latitude = locationInfo.get("latitude");
-            String longitude = locationInfo.get("longitude");
-            String title = hostel.getName();
+            if (locationInfo != null) {
 
-            if (latitude != null && longitude != null) {
-                Log.d(TAG, "showHostelOnMap: Adding markers to map");
-                LatLng location = new LatLng(Double.valueOf(latitude), Double.valueOf(longitude));
-                Marker marker = googleMap.addMarker(
-                        new MarkerOptions().position(location).title(title)
-                );
-                assert marker != null;
-                marker.setTag(hostel);
+                String stringLat = locationInfo.get("latitude");
+                String stringLon = locationInfo.get("longitude");
+                if (stringLat != null && !stringLat.trim().isEmpty()) {
+                    if (stringLon != null && !stringLon.trim().isEmpty()) {
+                        double latitude = Double.parseDouble(Objects.requireNonNull(stringLat));
+                        double longitude = Double.parseDouble(Objects.requireNonNull(locationInfo.get("longitude")));
+                        String title = hostel.getName();
+                        Log.d(TAG, "showHostelOnMap: Adding markers to map");
+                        LatLng location = new LatLng(latitude, longitude);
+                        Marker marker = googleMap.addMarker(
+                                new MarkerOptions().position(location).title(title)
+                        );
+                        assert marker != null;
+                        marker.setTag(hostel);
+                    }
+                }
             }
-
         }
     }
 

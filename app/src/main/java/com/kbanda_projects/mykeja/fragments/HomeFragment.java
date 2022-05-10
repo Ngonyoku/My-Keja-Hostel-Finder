@@ -1,10 +1,12 @@
 package com.kbanda_projects.mykeja.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +22,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -50,6 +53,7 @@ public class HomeFragment extends Fragment {
     private SearchView searchView;
     private List<Hostel> hostelList;
     private User user;
+    private ProgressDialog progressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,8 @@ public class HomeFragment extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
+
+        progressDialog = new ProgressDialog(requireActivity());
     }
 
     @Override
@@ -91,6 +97,22 @@ public class HomeFragment extends Fragment {
                     }
                 })
         ;
+
+        searchView
+                .setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String s) {
+                        if (!s.isEmpty()) {
+                            searchForHostelInDatabase(s);
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String s) {
+                        return false;
+                    }
+                });
 
         recyclerViewAdapter
                 .setOnHostelClickedListener(
@@ -148,7 +170,7 @@ public class HomeFragment extends Fragment {
                                 if (imageUrl != null) {
                                     if (!imageUrl.isEmpty()) {
                                         Glide
-                                                .with(getContext())
+                                                .with(requireActivity())
                                                 .load(imageUrl)
                                                 .centerCrop()
                                                 .into(userProfileImage)
@@ -192,34 +214,44 @@ public class HomeFragment extends Fragment {
                         }
                     })
             ;
-
         }
-
     }
 
     private void searchForHostelInDatabase(String query) {
+        progressDialog.setMessage("Searching for hostel");
+        progressDialog.create();
+        progressDialog.show();
         firebaseFirestore
                 .collection("Hostels")
-                .whereEqualTo("tags", query)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        if (error != null) {
-                            Log.w(TAG, "Listen failed.", error);
-                            return;
-                        }
-
-                        if (value != null) {
-                            hostelList.clear();
-                            for (DocumentChange documentChange : value.getDocumentChanges()) {
-                                Hostel hostel = documentChange.getDocument().toObject(Hostel.class);
-                                hostelList.add(hostel);
-                                recyclerViewAdapter.notifyDataSetChanged();
-                                Log.d(TAG, "onEvent: Documents -> " + hostel);
+                .whereArrayContains("tags", query)
+                .get()
+                .addOnCompleteListener(task -> {
+                    progressDialog.dismiss();
+                    if (task.isSuccessful()) {
+                        hostelList.clear();
+                        QuerySnapshot snapshot = task.getResult();
+                        if (snapshot != null) {
+                            if (!snapshot.isEmpty() && snapshot.size() > 0) {
+                                Log.d(TAG, "searchForHostelInDatabase: Search successful");
+                                for (DocumentSnapshot result : snapshot) {
+                                    Hostel hostel = result.toObject(Hostel.class);
+                                    hostelList.add(hostel);
+                                    recyclerViewAdapter.notifyDataSetChanged();
+                                }
                             }
-                        } else {
-                            Log.d(TAG, "onEvent: No listings available");
                         }
+                    } else {
+                        new AlertDialog
+                                .Builder(requireActivity())
+                                .setTitle("Item not found :(")
+                                .setMessage("It seems there are not items to match " + query + ". Try using another search term.")
+                                .setCancelable(true)
+                                .setPositiveButton("Ok", ((dialogInterface, i) -> {
+                                    dialogInterface.dismiss();
+                                }))
+                                .create()
+                                .show()
+                        ;
                     }
                 })
         ;
@@ -227,27 +259,46 @@ public class HomeFragment extends Fragment {
 
     private void fetchHostelsFromDatabase() {
         Log.d(TAG, "fetchHostelsFromDatabase: Fetching results");
+        progressDialog.setTitle("Fetching data");
+        progressDialog.setMessage("Fetching hostels");
+        progressDialog.create();
+        progressDialog.show();
+
         firebaseFirestore
                 .collection("Hostels")
                 .whereEqualTo("vacant", true)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        if (error != null) {
-                            Log.w(TAG, "Listen failed.", error);
-                            return;
-                        }
-
-                        if (value != null) {
-                            hostelList.clear();
-                            for (DocumentChange documentChange : value.getDocumentChanges()) {
-                                Hostel hostel = documentChange.getDocument().toObject(Hostel.class);
-                                hostelList.add(hostel);
-                                recyclerViewAdapter.notifyDataSetChanged();
-                                Log.d(TAG, "onEvent: Documents -> " + hostel);
+                        progressDialog.dismiss();
+                        if (error == null) {
+                            if (value != null && !value.isEmpty()) {
+                                if (value.size() > 0) {
+                                    //Ensure you get the last post of the document
+                                    for (DocumentChange documentChange : value.getDocumentChanges()) { //Loop over the documents
+                                        if (documentChange.getType() == DocumentChange.Type.ADDED) { //Check if any data has been added
+                                            Hostel hostelObject = documentChange.getDocument().toObject(Hostel.class);
+//                                            hostelObject.setDocumentId(documentChange.getDocument().getId());
+                                            hostelList.add(hostelObject);
+//                                            recyclerViewAdapter.notifyDataSetChanged();
+                                            recyclerViewAdapter.notifyDataSetChanged();
+                                            Log.d(TAG, "onEvent: Listing -> " + hostelObject.toString());
+                                        }
+                                    }
+                                }
+                            } else {
+                                new AlertDialog
+                                        .Builder(requireActivity())
+                                        .setMessage("It seems that there are no hostels present!")
+                                        .setPositiveButton("OK", ((dialogInterface, i) -> {
+                                        }))
+                                ;
                             }
                         } else {
-                            Log.d(TAG, "onEvent: No listings available");
+                            Log.d(TAG, "onEvent: Failed to load Hostels : -> " + error.getMessage());
+                            new AlertDialog.Builder(requireActivity())
+                                    .setTitle("Error")
+                                    .setMessage("Failed to load hostels : ");
                         }
                     }
                 })

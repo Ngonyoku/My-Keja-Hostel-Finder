@@ -10,11 +10,13 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
@@ -22,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -37,6 +40,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -46,9 +50,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.kbanda_projects.mykeja.adapters.HostelImagesRecyclerViewAdapter;
 import com.kbanda_projects.mykeja.models.Hostel;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,10 +72,13 @@ public class AdminAddEditHostel extends AppCompatActivity {
     public static final int REQUEST_CODE_GET_LOCATION_PERMISSION = 345;
     private FusedLocationProviderClient locationProviderClient;
 
+    //TODO: Input validation
+
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
     private FirebaseUser currentUser;
     private FirebaseStorage firebaseStorage;
+    private StorageReference userRootStorageReference;
     private ProgressDialog progressDialog;
 
     private RecyclerView imagesRecyclerView;
@@ -95,6 +105,9 @@ public class AdminAddEditHostel extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            userRootStorageReference = firebaseStorage.getReference(currentUser.getUid());
+        }
 
         setSupportActionBar(findViewById(R.id.adminAddEditHostelToolbar));
         getSupportActionBar().setTitle(null);
@@ -333,7 +346,6 @@ public class AdminAddEditHostel extends AppCompatActivity {
     }
 
     private void displayCurrentLocation(double latitude, double longitude) {
-
         latitudeTV.setText(String.valueOf(latitude));
         longitudeTV.setText(String.valueOf(longitude));
     }
@@ -358,11 +370,12 @@ public class AdminAddEditHostel extends AppCompatActivity {
                         .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentReference> task) {
-                                progressDialog.dismiss();
+//                                progressDialog.dismiss();
                                 if (task.isSuccessful()) {
-                                    Log.d(TAG, "onComplete: Saved hostel successfylly");
-                                    Toast.makeText(AdminAddEditHostel.this, "Saved sucessfully", Toast.LENGTH_SHORT).show();
-                                    finish();
+                                    Log.d(TAG, "onComplete: Saved hostel successfully");
+                                    saveImagesToFirebase(task.getResult());
+//                                    Toast.makeText(AdminAddEditHostel.this, "Saved sucessfully", Toast.LENGTH_SHORT).show();
+//                                    finish();
                                 } else {
                                     Log.d(TAG, "onComplete: Failed to save hostel");
                                 }
@@ -373,6 +386,51 @@ public class AdminAddEditHostel extends AppCompatActivity {
             }
         }
     }
+
+    private void saveImagesToFirebase(DocumentReference result) {
+        if (currentUser != null) {
+            if (result != null) {
+                if (hostelImageList != null && !hostelImageList.isEmpty()) {
+                    for (int i = 0; i < hostelImageList.size(); i++) {
+                        String hostelsId = result.getId();
+                        Uri imageUri = Uri.fromFile(new File(hostelImageList.get(i)));
+                        final StorageReference reference = userRootStorageReference
+                                .child("hostels")
+                                .child(hostelsId)
+                                .child(System.currentTimeMillis() + ".Kbanda");
+                        Log.d(TAG, "saveImagesToFirebase: Image File Extension ");
+                        UploadTask uploadTask = reference.putFile(imageUri);
+                        Task<Uri> objectTask = uploadTask
+                                .continueWithTask(task -> {
+                                    if (!task.isSuccessful()) throw task.getException();
+                                    return reference.getDownloadUrl();
+                                })
+                                .addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        Log.d(TAG, "saveImagesToFirebase: Image saved successfully");
+                                        String url = task.getResult().toString();
+                                        result.update("imageUrls", Arrays.asList(url));
+                                    } else {
+                                        Log.d(TAG, "saveImagesToFirebase: Failed to save image");
+                                        progressDialog.dismiss();
+                                    }
+                                });
+                        // {uID}/hostels/{hostelId}/images
+                    }
+                    progressDialog.dismiss();
+                }
+            }
+        }
+    }
+
+//
+//    private String getfileExtension(Uri uri) {
+//        String extension;
+//        ContentResolver contentResolver = getContentResolver();
+//        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+//        extension = mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+//        return extension;
+//    }
 
 
     @Override
