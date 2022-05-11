@@ -16,6 +16,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
@@ -167,6 +169,34 @@ public class AdminAddEditHostel extends AppCompatActivity {
                 Toast.makeText(AdminAddEditHostel.this, "Item: " + roomTypes[i], Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager =
+                (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        @SuppressLint("MissingPermission") NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        boolean isAvailable = false;
+        if (networkInfo != null && networkInfo.isConnected()) {
+            // Network is present and connected
+            isAvailable = true;
+        }
+        return isAvailable;
+    }
+
+    @Override
+    protected void onResume() {
+        if (!isNetworkAvailable()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("No Internet")
+                    .setMessage("This device is NOT connected to the internet")
+                    .setPositiveButton("connect", ((dialogInterface, i) -> {
+                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                    }))
+                    .create()
+                    .show()
+            ;
+        }
+        super.onResume();
     }
 
     @AfterPermissionGranted(REQUEST_CODE_GET_LOCATION_PERMISSION)

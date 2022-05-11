@@ -4,12 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -144,6 +149,34 @@ public class UserProfileActivity extends AppCompatActivity {
     private void logout() {
         firebaseAuth.signOut();
         finish();
+    }
+
+    @Override
+    protected void onResume() {
+        if (!isNetworkAvailable()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("No Internet")
+                    .setMessage("This device is NOT connected to the internet")
+                    .setPositiveButton("connect", ((dialogInterface, i) -> {
+                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                    }))
+                    .create()
+                    .show()
+            ;
+        }
+        super.onResume();
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager =
+                (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        @SuppressLint("MissingPermission") NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        boolean isAvailable = false;
+        if (networkInfo != null && networkInfo.isConnected()) {
+            // Network is present and connected
+            isAvailable = true;
+        }
+        return isAvailable;
     }
 
     private void saveProfile() {

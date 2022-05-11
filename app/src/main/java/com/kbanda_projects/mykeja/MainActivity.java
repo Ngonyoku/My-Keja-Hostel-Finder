@@ -1,6 +1,12 @@
 package com.kbanda_projects.mykeja;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -87,8 +93,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        if (!isNetworkAvailable()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("No Internet")
+                    .setMessage("This device is NOT connected to the internet")
+                    .setPositiveButton("connect", ((dialogInterface, i) -> {
+                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                    }))
+                    .create()
+                    .show()
+            ;
+        }
+        super.onStart();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        if (!isNetworkAvailable()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("No Internet")
+                    .setMessage("This device is NOT connected to the internet")
+                    .setPositiveButton("connect", ((dialogInterface, i) -> {
+                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                    }))
+                    .create()
+                    .show()
+            ;
+        }
         firebaseAuth.addAuthStateListener(authStateListener);
     }
 
@@ -103,5 +136,17 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentContainerView, fragment);
         fragmentTransaction.commit();
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager =
+                (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        @SuppressLint("MissingPermission") NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        boolean isAvailable = false;
+        if (networkInfo != null && networkInfo.isConnected()) {
+            // Network is present and connected
+            isAvailable = true;
+        }
+        return isAvailable;
     }
 }
