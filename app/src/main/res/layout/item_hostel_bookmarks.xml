@@ -18,11 +18,12 @@
 
         <!-- Media -->
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/hostelFirstImage"
             android:layout_width="180dp"
-            android:layout_height="194dp"
+            android:layout_height="180dp"
             android:contentDescription="Hostel image"
             android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic" />
@@ -32,25 +33,27 @@
             android:layout_height="0dp"
             android:orientation="vertical"
             android:padding="16dp"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+            app:layout_constraintBottom_toBottomOf="@+id/hostelFirstImage"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView2"
+            app:layout_constraintStart_toEndOf="@+id/hostelFirstImage"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
 
             <!-- Title, secondary and supporting text -->
             <TextView
+                android:id="@+id/hostelNameTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Name of the Hostel"
                 android:textAppearance="?attr/textAppearanceHeadline6" />
 
             <TextView
+                android:id="@+id/hostelRentPriceTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Ksh. 5000 per month"
-                android:textAppearance="?attr/textAppearanceBody2"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="?android:attr/textColorSecondary" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

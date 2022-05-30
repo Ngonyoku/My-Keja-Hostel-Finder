@@ -15,17 +15,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.chip.Chip;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.kbanda_projects.mykeja.adapters.HostelImagesRecyclerViewAdapter;
 import com.kbanda_projects.mykeja.models.Hostel;
 import com.kbanda_projects.mykeja.models.User;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -121,10 +124,15 @@ public class HostelDetailsActivity extends AppCompatActivity {
                     whatsAppLandLord();
                 })
         ;
+
+        invalidateOptionsMenu();
     }
+
+    private Menu menuItem;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menuItem = menu;
         getMenuInflater().inflate(R.menu.hostel_details_menu, menu);
         MenuItem actionEditHostel = menu.findItem(R.id.actionEditHostel);
         if (currentUser != null) {
@@ -152,10 +160,44 @@ public class HostelDetailsActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             }
+            case R.id.actionBookMarkHostel: {
+                bookMarkHostel();
+            }
             default:
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    @Override
+    public void invalidateOptionsMenu() {
+        super.invalidateOptionsMenu();
+    }
+
+    private void bookMarkHostel() {
+        if (currentUser != null) {
+            if (currentHostelObject != null) {
+                String documentId = currentHostelObject.getDocumentId();
+                currentHostelObject.setBookMarks(Arrays.asList(currentUser.getUid()));
+                if (documentId != null && !documentId.trim().isEmpty()) {
+                    firestore
+                            .collection("Hostels")
+                            .document(documentId)
+                            .set(currentHostelObject, SetOptions.merge())
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "bookMarkHostel: Hostel Bookmarked");
+                                    Toast.makeText(this, "Hostel Bookmarked", Toast.LENGTH_SHORT).show();
+
+                                } else {
+                                    Log.d(TAG, "bookMarkHostel: Failed to bookmark hostel");
+
+                                }
+                            })
+                    ;
+                }
+            }
+        }
     }
 
     @AfterPermissionGranted(REQUEST_CODE_CALL)

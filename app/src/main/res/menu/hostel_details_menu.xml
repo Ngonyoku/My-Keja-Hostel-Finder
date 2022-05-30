@@ -2,8 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/actionBookMarkHostel"
+        android:icon="@drawable/ic_bookmark_uncheked"
+        android:title="bookmark"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/actionEditHostel"
         android:icon="@drawable/ic_edit"
         android:title="edit"
-        app:showAsAction="always|withText" />
+        android:visible="false"
+        app:showAsAction="ifRoom|withText" />
 </menu>

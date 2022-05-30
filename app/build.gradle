@@ -32,6 +32,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.kbanda_projects.mykeja'
 }
 
 dependencies {
@@ -42,6 +43,7 @@ dependencies {
     implementation 'com.google.android.libraries.places:places:2.6.0' //Google Places SDK
     implementation 'com.google.android.material:material:1.5.0'
 //    implementation 'io.ak1.pix:piximagepicker:1.6.3'
+    implementation 'com.github.arimorty:floatingsearchview:2.1.1'
     implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
     implementation 'me.zhanghai.android.materialratingbar:library:1.4.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0' //Circle Image View

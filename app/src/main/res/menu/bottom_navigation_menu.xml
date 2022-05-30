@@ -14,7 +14,7 @@
         app:showAsAction="always|withText" />
     <item
         android:id="@+id/bookMarkFragment"
-        android:icon="@drawable/ic_ookmark"
+        android:icon="@drawable/ic_bookmark"
         android:title="Bookmarks"
         app:showAsAction="always|withText" />
 </menu>

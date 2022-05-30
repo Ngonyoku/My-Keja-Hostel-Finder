@@ -13,11 +13,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -48,21 +53,70 @@ public class HomeFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
     private FirebaseUser currentUser;
     private HostelRecyclerViewAdapter recyclerViewAdapter;
-    private FloatingActionButton fabAddEditHostelInformation;
-    private CircleImageView userProfileImage;
-    private SearchView searchView;
     private List<Hostel> hostelList;
-    private User user;
     private ProgressDialog progressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         firebaseAuth = FirebaseAuth.getInstance();
+        setHasOptionsMenu(true);
         currentUser = firebaseAuth.getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
-
         progressDialog = new ProgressDialog(requireActivity());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.hostels_toolbar, menu);
+        MenuItem searchViewItem = menu.findItem(R.id.actionSearchHostel);
+        SearchView searchView = (SearchView) searchViewItem.getActionView();
+        searchView.setQueryHint("Search Hostel...");
+        searchView
+                .setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String s) {
+                        List<Hostel> searchHostelResults = new ArrayList<>();
+                        if (!s.trim().isEmpty()) {
+                            if (!hostelList.isEmpty()) {
+                                for (Hostel hostel : hostelList) {
+                                    if (hostel.getTags().contains(s)) {
+                                        searchHostelResults.add(hostel);
+                                    }
+                                }
+
+                                hostelList.clear();
+                                if (!searchHostelResults.isEmpty()) {
+                                    for (Hostel hostel : searchHostelResults) {
+                                        hostelList.add(hostel);
+                                        recyclerViewAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            }
+                        } else {
+                            Toast.makeText(requireActivity(), "Nothing to search", Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String s) {
+                        return false;
+                    }
+                });
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.actionRefreshHostels: {
+                fetchHostelsFromDatabase();
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -73,46 +127,10 @@ public class HomeFragment extends Fragment {
         hostelList = new ArrayList<>();
         RecyclerView recyclerView = view.findViewById(R.id.mainRecyclerView);
         recyclerViewAdapter = new HostelRecyclerViewAdapter(requireActivity(), hostelList);
-        searchView = view.findViewById(R.id.searchViewHome);
-        userProfileImage = view.findViewById(R.id.profileImage);
-        fabAddEditHostelInformation = view.findViewById(R.id.fabAddEditHostelInformation);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
         fetchHostelsFromDatabase();
-
-        //TODO: Be able to search for Hostels
-
-        if (user == null) userProfileImage.setVisibility(View.GONE);
-        else userProfileImage.setVisibility(View.VISIBLE);
-
-        fabAddEditHostelInformation.setVisibility(View.GONE);
-
-        userProfileImage
-                .setOnClickListener(v -> {
-                    Intent intent = new Intent(requireActivity(), UserProfileActivity.class);
-                    if (user != null) {
-                        intent.putExtra("user", user);
-                        requireActivity().startActivity(intent);
-                    }
-                })
-        ;
-
-        searchView
-                .setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                    @Override
-                    public boolean onQueryTextSubmit(String s) {
-                        if (!s.isEmpty()) {
-                            searchForHostelInDatabase(s);
-                        }
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onQueryTextChange(String s) {
-                        return false;
-                    }
-                });
 
         recyclerViewAdapter
                 .setOnHostelClickedListener(
@@ -122,6 +140,7 @@ public class HomeFragment extends Fragment {
                                 Hostel currentHostel = hostelList.get(position);
                                 Intent intent = new Intent(requireActivity(), HostelDetailsActivity.class);
                                 intent.putExtra("currentHostel", currentHostel);
+//                                intent.putExtra("documentId")
                                 requireActivity()
                                         .startActivity(intent);
                             }
@@ -132,129 +151,12 @@ public class HomeFragment extends Fragment {
                             }
                         })
         ;
-        fabAddEditHostelInformation
-                .setOnClickListener(v -> {
-                    startActivity(new Intent(requireActivity(), AdminAddEditHostel.class));
-                })
-        ;
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        fetchUserData();
-    }
-
-    private void fetchUserData() {
-        if (currentUser != null) {
-            Log.d(TAG, "onViewCreated: Loading User information");
-            firebaseFirestore
-                    .collection("Users")
-                    .document(currentUser.getUid())
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "onViewCreated: Successfully retrieved user data from firebase");
-                            if (task.getResult().exists()) { //Check if the document exists
-                                user = task.getResult().toObject(User.class);
-                                String imageUrl = user.getProfileImageUrl();
-                                String userRole = user.getRole();
-                                if (userRole.equals("ADMIN")) {
-                                    fabAddEditHostelInformation.setVisibility(View.VISIBLE);
-                                } else if (userRole.equals("USER")) {
-                                    fabAddEditHostelInformation.setVisibility(View.GONE);
-                                }
-                                Log.d(TAG, "onViewCreated: User Information -> " + user.toString());
-                                userProfileImage.setVisibility(View.VISIBLE);
-                                if (imageUrl != null) {
-                                    if (!imageUrl.isEmpty()) {
-                                        Glide
-                                                .with(requireActivity())
-                                                .load(imageUrl)
-                                                .centerCrop()
-                                                .into(userProfileImage)
-                                        ;
-                                    }
-                                }
-                            } else {
-                                createUserDocumentInFirestore();
-                            }
-                        } else {
-                            Log.d(TAG, "onViewCreated: Failed to fetch user data from firebase -> " + task.getException().getMessage());
-                        }
-                    })
-                    .addOnFailureListener(Throwable::printStackTrace)
-            ;
-        }
-    }
-
-    private void createUserDocumentInFirestore() {
-        if (currentUser != null) {
-            String currentUserUid = currentUser.getUid();
-            User userDetails = new User();
-            userDetails.setFirstName("");
-            userDetails.setLastName("");
-            userDetails.setProfileImageUrl("");
-            userDetails.setUserId(currentUserUid);
-            userDetails.setEmail(currentUser.getEmail());
-            userDetails.setRole("USER");
-            userDetails.setPhoneNumber("");
-
-            firebaseFirestore
-                    .collection("Users")
-                    .document(currentUserUid)
-                    .set(userDetails)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "createUserDocumentInFirestore: User created successfully");
-                        } else {
-                            Log.d(TAG, "createUserDocumentInFirestore: Failed to create user document in firebase -> "
-                                    + task.getResult());
-                        }
-                    })
-            ;
-        }
-    }
-
-    private void searchForHostelInDatabase(String query) {
-        progressDialog.setMessage("Searching for hostel");
-        progressDialog.create();
-        progressDialog.show();
-        firebaseFirestore
-                .collection("Hostels")
-                .whereArrayContains("tags", query)
-                .get()
-                .addOnCompleteListener(task -> {
-                    progressDialog.dismiss();
-                    if (task.isSuccessful()) {
-                        hostelList.clear();
-                        QuerySnapshot snapshot = task.getResult();
-                        if (snapshot != null) {
-                            if (!snapshot.isEmpty() && snapshot.size() > 0) {
-                                Log.d(TAG, "searchForHostelInDatabase: Search successful");
-                                for (DocumentSnapshot result : snapshot) {
-                                    Hostel hostel = result.toObject(Hostel.class);
-                                    hostelList.add(hostel);
-                                    recyclerViewAdapter.notifyDataSetChanged();
-                                }
-                            }
-                        }
-                    } else {
-                        new AlertDialog
-                                .Builder(requireActivity())
-                                .setTitle("Item not found :(")
-                                .setMessage("It seems there are not items to match " + query + ". Try using another search term.")
-                                .setCancelable(true)
-                                .setPositiveButton("Ok", ((dialogInterface, i) -> {
-                                    dialogInterface.dismiss();
-                                }))
-                                .create()
-                                .show()
-                        ;
-                    }
-                })
-        ;
     }
 
     private void fetchHostelsFromDatabase() {
@@ -275,10 +177,11 @@ public class HomeFragment extends Fragment {
                             if (value != null && !value.isEmpty()) {
                                 if (value.size() > 0) {
                                     //Ensure you get the last post of the document
+                                    hostelList.clear();
                                     for (DocumentChange documentChange : value.getDocumentChanges()) { //Loop over the documents
                                         if (documentChange.getType() == DocumentChange.Type.ADDED) { //Check if any data has been added
                                             Hostel hostelObject = documentChange.getDocument().toObject(Hostel.class);
-//                                            hostelObject.setDocumentId(documentChange.getDocument().getId());
+                                            hostelObject.setDocumentId(documentChange.getDocument().getId());
                                             hostelList.add(hostelObject);
 //                                            recyclerViewAdapter.notifyDataSetChanged();
                                             recyclerViewAdapter.notifyDataSetChanged();

@@ -96,6 +96,8 @@ public class UserProfileActivity extends AppCompatActivity {
                 String firstName = user.getFirstName();
                 if (firstName != null) {
                     firstNameTILEditText.setText(firstName);
+                } else {
+                    firstNameTILEditText.setError("Your First Name is required.");
                 }
                 String lastName = user.getLastName();
                 if (lastName != null) {
@@ -104,6 +106,8 @@ public class UserProfileActivity extends AppCompatActivity {
                 String phoneNumber = user.getPhoneNumber();
                 if (phoneNumber != null) {
                     phoneNumberTilEditText.setText(phoneNumber);
+                } else {
+                    phoneNumberTilEditText.setError("Please enter your phone number");
                 }
                 String imageUrl = user.getProfileImageUrl();
                 if (imageUrl != null) {
@@ -196,7 +200,7 @@ public class UserProfileActivity extends AppCompatActivity {
                         .getReference(currentUser.getUid())
                         .child(System.currentTimeMillis()
                                 + "."
-                                + getfileExtension(Uri.parse(profileImageStringUri))
+                                + getFileExtension(Uri.parse(profileImageStringUri))
                         );
                 Uri imageFile = Uri.fromFile(new File(profileImageStringUri));
                 UploadTask uploadTask = reference.putFile(imageFile);
@@ -225,7 +229,7 @@ public class UserProfileActivity extends AppCompatActivity {
         }
     }
 
-    private String getfileExtension(Uri uri) {
+    private String getFileExtension(Uri uri) {
         String extension;
         ContentResolver contentResolver = getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();

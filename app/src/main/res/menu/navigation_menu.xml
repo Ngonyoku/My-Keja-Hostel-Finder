@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--Admin-->
+    <group
+        android:id="@+id/navigationGroupAdmin"
+        android:checkableBehavior="single"
+        android:visible="false">
+        <item android:title="Admin">
+            <menu>
+                <item
+                    android:id="@+id/actionAddHostelAdmin"
+                    android:icon="@drawable/ic_add_hostel"
+                    android:title="Add Hostel"
+                    app:showAsAction="ifRoom|withText" />
+                <item
+                    android:id="@+id/actionManageLandLordsAdmin"
+                    android:icon="@drawable/ic_people"
+                    android:title="Manage Landlords"
+                    app:showAsAction="ifRoom|withText" />
+            </menu>
+        </item>
+    </group>
+    <!--All Users-->
+    <group
+        android:id="@+id/navigationGroup"
+        android:checkableBehavior="single">
+        <item android:title="Navigation">
+            <menu>
+                <item
+                    android:id="@+id/actionHome"
+                    android:icon="@drawable/ic_home"
+                    android:title="Home"
+                    app:showAsAction="ifRoom|withText" />
+                <item
+                    android:id="@+id/actionMapSearch"
+                    android:icon="@drawable/ic_gps"
+                    android:title="Map Search"
+                    app:showAsAction="ifRoom|withText" />
+                <item
+                    android:id="@+id/actionBookMark"
+                    android:icon="@drawable/ic_bookmark"
+                    android:title="BookMarks"
+                    app:showAsAction="ifRoom|withText" />
+            </menu>
+        </item>
+        <item
+            android:id="@+id/actionFeedback"
+            android:icon="@drawable/ic_feedback"
+            android:title="Feedback"
+            app:showAsAction="ifRoom|withText" />
+        <item
+            android:id="@+id/actionProfile"
+            android:icon="@drawable/ic_settings"
+            android:title="Account"
+            app:showAsAction="ifRoom|withText" />
+        <item
+            android:id="@+id/actionLogout"
+            android:icon="@drawable/ic_power"
+            android:title="Logout"
+            app:showAsAction="ifRoom|withText" />
+    </group>
+</menu>

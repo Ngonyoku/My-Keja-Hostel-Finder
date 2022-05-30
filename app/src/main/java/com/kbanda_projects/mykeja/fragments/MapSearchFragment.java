@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -16,8 +17,12 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -59,6 +64,7 @@ public class MapSearchFragment extends Fragment {
     private GoogleMap map;
     private FirebaseFirestore firebaseFirestore;
     private List<Hostel> hostelList;
+    private SearchView searchView;
 
     //TODO: Display List of hostels
 
@@ -69,18 +75,63 @@ public class MapSearchFragment extends Fragment {
 //            map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
             checkLocationPermissions(googleMap);
             map
-                    .setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                        @Override
-                        public boolean onMarkerClick(@NonNull Marker marker) {
-                            Intent intent = new Intent(requireActivity(), HostelDetailsActivity.class);
-                            Hostel selectedHostel = (Hostel) marker.getTag();
-                            intent.putExtra("currentHostel", selectedHostel);
-                            requireActivity().startActivity(intent);
-                            return false;
-                        }
-                    });
+                    .setOnMarkerClickListener(marker -> {
+                        Intent intent = new Intent(requireActivity(), HostelDetailsActivity.class);
+                        Hostel selectedHostel = (Hostel) marker.getTag();
+                        intent.putExtra("currentHostel", selectedHostel);
+                        requireActivity().startActivity(intent);
+                        return false;
+                    })
+            ;
         }
     };
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.map_search_toolbar, menu);
+        MenuItem searchViewItem = menu.findItem(R.id.actionSearchHostel);
+        searchView = (SearchView) searchViewItem.getActionView();
+        searchView.setQueryHint("Find Hostel...");
+        searchView
+                .setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String s) {
+                        if (!s.isEmpty()) {
+                            for (Hostel hostel : hostelList) {
+                                if (hostel.getTags().contains(s)) {
+                                    showHostelOnMap(map, hostel, BitmapDescriptorFactory.HUE_MAGENTA);
+                                }
+                            }
+                        } else {
+                            Toast.makeText(requireActivity(), "Nothing to search", Toast.LENGTH_SHORT).show();
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String s) {
+                        return false;
+                    }
+                });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.actionGetCurrentLocation: {
+                getUserCurrentLocation(map);
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Nullable
     @Override
@@ -92,7 +143,8 @@ public class MapSearchFragment extends Fragment {
         hostelList = new ArrayList<>();
         firebaseFirestore = FirebaseFirestore.getInstance();
         locationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        return inflater.inflate(R.layout.fragment_map_search, container, false);
+        View view = inflater.inflate(R.layout.fragment_map_search, container, false);
+        return view;
     }
 
     @Override
@@ -173,7 +225,7 @@ public class MapSearchFragment extends Fragment {
                                         )
                                 ;
                             }
-                            fetchHostelsFromDatabase(googleMap);
+                            fetchHostelsFromDatabase();
                         }
                     });
         } else {
@@ -208,7 +260,7 @@ public class MapSearchFragment extends Fragment {
         ;
     }
 
-    private void fetchHostelsFromDatabase(GoogleMap googleMap) {
+    private void fetchHostelsFromDatabase() {
         Log.d(TAG, "fetchHostelsFromDatabase: Fetching hostels from database");
         firebaseFirestore
                 .collection("Hostels")
@@ -228,7 +280,7 @@ public class MapSearchFragment extends Fragment {
                                 Hostel hostel = documentChange.getDocument().toObject(Hostel.class);
                                 hostelList.add(hostel);
                                 Log.d(TAG, "onEvent: Documents -> " + hostel);
-                                showHostelOnMap(googleMap, hostel);
+                                showHostelOnMap(map, hostel);
                             }
                         } else {
                             Log.d(TAG, "onEvent: No listings available");
@@ -243,11 +295,9 @@ public class MapSearchFragment extends Fragment {
      * */
     private void showHostelOnMap(GoogleMap googleMap, Hostel hostel) {
         if (map != null) {
-
             Log.d(TAG, "showHostelOnMap: Hostel -> " + hostel.toString());
             Map<String, String> locationInfo = hostel.getLocationInfo();
             if (locationInfo != null) {
-
                 String stringLat = locationInfo.get("latitude");
                 String stringLon = locationInfo.get("longitude");
                 if (stringLat != null && !stringLat.trim().isEmpty()) {
@@ -259,6 +309,34 @@ public class MapSearchFragment extends Fragment {
                         LatLng location = new LatLng(latitude, longitude);
                         Marker marker = googleMap.addMarker(
                                 new MarkerOptions().position(location).title(title)
+                        );
+                        assert marker != null;
+                        marker.setTag(hostel);
+                    }
+                }
+            }
+        }
+    }
+
+    private void showHostelOnMap(GoogleMap googleMap, Hostel hostel, float markerHue) {
+        if (map != null) {
+            Log.d(TAG, "showHostelOnMap: Hostel -> " + hostel.toString());
+            Map<String, String> locationInfo = hostel.getLocationInfo();
+            if (locationInfo != null) {
+                String stringLat = locationInfo.get("latitude");
+                String stringLon = locationInfo.get("longitude");
+                if (stringLat != null && !stringLat.trim().isEmpty()) {
+                    if (stringLon != null && !stringLon.trim().isEmpty()) {
+                        double latitude = Double.parseDouble(Objects.requireNonNull(stringLat));
+                        double longitude = Double.parseDouble(Objects.requireNonNull(locationInfo.get("longitude")));
+                        String title = hostel.getName();
+                        Log.d(TAG, "showHostelOnMap: Adding markers to map");
+                        LatLng location = new LatLng(latitude, longitude);
+                        Marker marker = googleMap.addMarker(
+                                new MarkerOptions()
+                                        .position(location)
+                                        .title(title)
+                                        .icon(BitmapDescriptorFactory.defaultMarker(markerHue))
                         );
                         assert marker != null;
                         marker.setTag(hostel);

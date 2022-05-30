@@ -1,11 +1,13 @@
 package com.kbanda_projects.mykeja.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class Hostel implements Serializable {
+    private String documentId;
     private String name = "";
     private String ownerId = "";
     private String propertyType = "Apartment";
@@ -21,6 +23,7 @@ public class Hostel implements Serializable {
     private List<String> imageUrls = Arrays.asList();
     private boolean isVacant = true;
     private Map<String, String> locationInfo;
+    private List<String> bookMarks = new ArrayList<>();
 
     public Hostel(
             String description,
@@ -64,12 +67,28 @@ public class Hostel implements Serializable {
     public Hostel() {
     }
 
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<String> getBookMarks() {
+        return bookMarks;
+    }
+
+    public void setBookMarks(List<String> bookMarks) {
+        this.bookMarks = bookMarks;
     }
 
     public boolean isHasField() {
@@ -187,14 +206,7 @@ public class Hostel implements Serializable {
     @Override
     public String toString() {
         return "Hostel{" +
-                "description='" + description + '\'' +
-                ", hasField=" + hasField +
-                ", hasParking=" + hasParking +
-                ", hasWifi=" + hasWifi +
-                ", imageUrls=" + imageUrls +
-                ", isVacant=" + isVacant +
-                ", locationInfo=" + locationInfo +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", ownerId='" + ownerId + '\'' +
                 ", propertyType='" + propertyType + '\'' +
                 ", ratings='" + ratings + '\'' +
@@ -202,6 +214,14 @@ public class Hostel implements Serializable {
                 ", roomType='" + roomType + '\'' +
                 ", tags=" + tags +
                 ", totalRoomsAvailable='" + totalRoomsAvailable + '\'' +
+                ", description='" + description + '\'' +
+                ", hasField=" + hasField +
+                ", hasParking=" + hasParking +
+                ", hasWifi=" + hasWifi +
+                ", imageUrls=" + imageUrls +
+                ", isVacant=" + isVacant +
+                ", locationInfo=" + locationInfo +
+                ", bookMarks=" + bookMarks +
                 '}';
     }
 }
