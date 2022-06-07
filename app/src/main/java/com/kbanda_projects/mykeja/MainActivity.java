@@ -326,6 +326,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 .with(this)
                                 .load(profileImageUrl)
                                 .centerCrop()
+                                .placeholder(R.drawable.ic_user_placeholder)
                                 .fitCenter()
                                 .into(profileImage)
                         ;

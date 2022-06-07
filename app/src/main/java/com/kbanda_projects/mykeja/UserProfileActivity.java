@@ -23,6 +23,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.firebase.ui.auth.AuthUI;
 import com.fxn.pix.Options;
 import com.fxn.pix.Pix;
 import com.fxn.utility.PermUtil;
@@ -151,7 +152,19 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void logout() {
-        firebaseAuth.signOut();
+        AuthUI
+                .getInstance()
+                .signOut(this)
+                .addOnCompleteListener(
+                        task -> {
+                            if (task.isSuccessful()) {
+                                finish();
+                            } else {
+                                Log.d(TAG, "logout: Failed to logout -> " + task.getException());
+                                Toast.makeText(this, "Failed to log out. Please try again later!", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+        ;
         finish();
     }
 
@@ -194,37 +207,45 @@ public class UserProfileActivity extends AppCompatActivity {
             progressDialog.create();
             progressDialog.show();
             User userDetails = new User(firstName, lastName, email, phoneNumber);
-            if (profileImageStringUri != null) {
-                //Upload image to firebase
-                final StorageReference reference = firebaseStorage
-                        .getReference(currentUser.getUid())
-                        .child(System.currentTimeMillis()
-                                + "."
-                                + getFileExtension(Uri.parse(profileImageStringUri))
-                        );
-                Uri imageFile = Uri.fromFile(new File(profileImageStringUri));
-                UploadTask uploadTask = reference.putFile(imageFile);
-                uploadTask
-                        .continueWithTask(task -> {
-                            if (!task.isSuccessful()) {
-                                throw task.getException();
-                            }
-                            return reference.getDownloadUrl();
-                        })
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                String url = task.getResult().toString();
-                                Log.d(TAG, "saveProfile: Download URL extracted -> " + url);
-                                userDetails.setProfileImageUrl(url);
-                                saveToFirebaseDatabase(userDetails);
-                            } else {
-                                progressDialog.dismiss();
-                                Log.d(TAG, "saveProfile: Failed to get Download URL -> " + task.getException().getMessage());
-                            }
-                        })
-                ;
-            } else {
-                saveToFirebaseDatabase(userDetails);
+            if (user != null) {
+                if (user.getRole() != null) {
+                    userDetails.setRole(user.getRole());
+                } else {
+                    userDetails.setRole("USER");
+                }
+
+                if (profileImageStringUri != null) {
+                    //Upload image to firebase
+                    final StorageReference reference = firebaseStorage
+                            .getReference(currentUser.getUid())
+                            .child(System.currentTimeMillis()
+                                    + "."
+                                    + getFileExtension(Uri.parse(profileImageStringUri))
+                            );
+                    Uri imageFile = Uri.fromFile(new File(profileImageStringUri));
+                    UploadTask uploadTask = reference.putFile(imageFile);
+                    uploadTask
+                            .continueWithTask(task -> {
+                                if (!task.isSuccessful()) {
+                                    throw task.getException();
+                                }
+                                return reference.getDownloadUrl();
+                            })
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    String url = task.getResult().toString();
+                                    Log.d(TAG, "saveProfile: Download URL extracted -> " + url);
+                                    userDetails.setProfileImageUrl(url);
+                                    saveToFirebaseDatabase(userDetails);
+                                } else {
+                                    progressDialog.dismiss();
+                                    Log.d(TAG, "saveProfile: Failed to get Download URL -> " + task.getException().getMessage());
+                                }
+                            })
+                    ;
+                } else {
+                    saveToFirebaseDatabase(userDetails);
+                }
             }
         }
     }
@@ -276,7 +297,6 @@ public class UserProfileActivity extends AppCompatActivity {
                 if (returnValue != null) {
                     profileImageStringUri = returnValue.get(0);
                     if (profileImageStringUri != null && !profileImageStringUri.isEmpty()) {
-
                         Glide
                                 .with(this)
                                 .load(profileImageStringUri)

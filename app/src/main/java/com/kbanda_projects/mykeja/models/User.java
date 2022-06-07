@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class User implements Serializable {
     private String userId = "";
-    private String role = "USER"; //USER, LANDLORD, ADMIN
+    private String role; //USER, LANDLORD, ADMIN
     private String profileImageUrl = "";
     private String firstName = "";
     private String lastName = "";

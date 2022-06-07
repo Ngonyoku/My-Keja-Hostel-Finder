@@ -76,19 +76,16 @@ public class ManageFeedbackFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
         recyclerViewAdapter
-                .setOnFeedbackClickedListener(new FeedbackRecyclerViewAdapter.OnFeedbackClickedListener() {
-                    @Override
-                    public void onClick(int position, String userPhoneNumber) {
-                        new AlertDialog.Builder(requireActivity())
+                .setOnFeedbackClickedListener(
+                        (position, userPhoneNumber) -> new AlertDialog.Builder(requireActivity())
+                                .setTitle("Manage Feedback")
+                                .setIcon(R.drawable.ic_feedback)
                                 .setMessage("Contact user")
                                 .setPositiveButton("call", ((dialogInterface, i) -> {
                                     checkLocationPermissions(userPhoneNumber);
                                 }))
                                 .create()
-                                .show()
-                        ;
-                    }
-                })
+                                .show())
         ;
         recyclerView.setAdapter(recyclerViewAdapter);
 

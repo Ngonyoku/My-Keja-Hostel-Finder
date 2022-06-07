@@ -60,7 +60,6 @@ public class FeedbackRecyclerViewAdapter extends RecyclerView.Adapter<FeedbackRe
     public void onBindViewHolder(@NonNull FeedbackViewHolder holder, int position) {
         Feedback feedback = feedbackList.get(position);
         String comment = feedback.getComment();
-        String timeInMillis = feedback.getTimeInMillis();
         holder.feedbackComment.setText(comment);
         String timeStamp = convertCurrentTimeInMillisToStringTimeStamp(feedback);
         if (timeStamp != null) {
