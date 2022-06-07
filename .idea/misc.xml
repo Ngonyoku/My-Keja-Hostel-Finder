@@ -10,6 +10,7 @@
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/drawable/ic_call.xml" value="0.1295" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/drawable/ic_edit.xml" value="0.137" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/drawable/ic_error.xml" value="0.1925" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/drawable/ic_feed.xml" value="0.1925" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/drawable/ic_feedback.xml" value="0.1925" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/drawable/ic_gps.xml" value="0.137" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/drawable/ic_home.xml" value="0.1805" />
@@ -35,7 +36,9 @@
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/fragment_book_mark.xml" value="0.1703125" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/fragment_home.xml" value="0.15305686190679776" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/fragment_landlords.xml" value="0.22" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/fragment_manage_feedback.xml" value="0.1513467293715263" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/fragment_map_search.xml" value="0.184375" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/item_feedback.xml" value="0.22" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/item_hostel.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/item_hostel_bookmarks.xml" value="0.1513467293715263" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/MyKeja/app/src/main/res/layout/item_hostel_image.xml" value="0.184375" />

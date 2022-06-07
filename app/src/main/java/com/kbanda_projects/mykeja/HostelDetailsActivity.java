@@ -128,11 +128,8 @@ public class HostelDetailsActivity extends AppCompatActivity {
         invalidateOptionsMenu();
     }
 
-    private Menu menuItem;
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        this.menuItem = menu;
         getMenuInflater().inflate(R.menu.hostel_details_menu, menu);
         MenuItem actionEditHostel = menu.findItem(R.id.actionEditHostel);
         if (currentUser != null) {
@@ -166,7 +163,6 @@ public class HostelDetailsActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 
     @Override
@@ -175,29 +171,7 @@ public class HostelDetailsActivity extends AppCompatActivity {
     }
 
     private void bookMarkHostel() {
-        if (currentUser != null) {
-            if (currentHostelObject != null) {
-                String documentId = currentHostelObject.getDocumentId();
-                currentHostelObject.setBookMarks(Arrays.asList(currentUser.getUid()));
-                if (documentId != null && !documentId.trim().isEmpty()) {
-                    firestore
-                            .collection("Hostels")
-                            .document(documentId)
-                            .set(currentHostelObject, SetOptions.merge())
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Log.d(TAG, "bookMarkHostel: Hostel Bookmarked");
-                                    Toast.makeText(this, "Hostel Bookmarked", Toast.LENGTH_SHORT).show();
-
-                                } else {
-                                    Log.d(TAG, "bookMarkHostel: Failed to bookmark hostel");
-
-                                }
-                            })
-                    ;
-                }
-            }
-        }
+        //TODO: Implement Bookmarks
     }
 
     @AfterPermissionGranted(REQUEST_CODE_CALL)

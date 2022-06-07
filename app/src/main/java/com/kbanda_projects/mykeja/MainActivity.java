@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -39,6 +40,7 @@ import com.kbanda_projects.mykeja.databinding.ActivityMainBinding;
 import com.kbanda_projects.mykeja.fragments.BookMarkFragment;
 import com.kbanda_projects.mykeja.fragments.HomeFragment;
 import com.kbanda_projects.mykeja.fragments.LandlordsFragment;
+import com.kbanda_projects.mykeja.fragments.ManageFeedbackFragment;
 import com.kbanda_projects.mykeja.fragments.MapSearchFragment;
 import com.kbanda_projects.mykeja.models.User;
 
@@ -51,6 +53,10 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MainActivity";
     private ActivityMainBinding activityMainBinding;
+
+    //TODO: Check Navigation Drawer
+    //TODO: App closes when it starts
+    //TODO: Add Bookmark
 
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
@@ -77,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(activityMainBinding.getRoot());
+
         progressDialog = new ProgressDialog(this);
         Toolbar toolbar = findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
@@ -117,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 .createSignInIntentBuilder()
                                 .setIsSmartLockEnabled(false)
                                 .setAvailableProviders(providers)
+                                .setLogo(R.mipmap.ic_launcher)
                                 .setTheme(R.style.Theme_MyKeja)
                                 .build(),
                         RC_SIGN_IN
@@ -171,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentContainerView, fragment);
         fragmentTransaction.commit();
+//        drawerLayout.closeDrawers();
     }
 
     private boolean isNetworkAvailable() {
@@ -236,7 +245,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             if (task.isSuccessful()) {
                                 return;
                             } else {
-                                Log.d(TAG, "registerUserToDatabase: Failed to add user to database");
+                                Log.d(TAG, "registerUserToDatabase: Failed to add user to database -> "
+                                        + task.getException().getMessage());
                             }
                         })
                 ;
@@ -330,31 +340,43 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (item.getItemId()) {
             case R.id.actionHome: {
                 replaceFragment(homeFragment);
+                closeNavDrawer();
                 return true;
             }
             case R.id.actionMapSearch: {
                 replaceFragment(mapSearchFragment);
+                closeNavDrawer();
                 return true;
             }
             case R.id.actionBookMark: {
                 replaceFragment(bookMarkFragment);
+                closeNavDrawer();
                 return true;
             }
             case R.id.actionProfile: {
                 openUserProfileActivity();
+                closeNavDrawer();
                 return true;
             }
             case R.id.actionAddHostelAdmin: {
                 startActivity(new Intent(this, AdminAddEditHostel.class));
+                closeNavDrawer();
                 return true;
             }
             case R.id.actionFeedback: {
                 openFeedbackBottomSheet();
+                closeNavDrawer();
                 return true;
             }
             case R.id.actionManageLandLordsAdmin: {
                 landlordsFragment = new LandlordsFragment();
                 replaceFragment(landlordsFragment);
+                closeNavDrawer();
+                return true;
+            }
+            case R.id.actionManageFeedback: {
+                replaceFragment(new ManageFeedbackFragment());
+                closeNavDrawer();
                 return true;
             }
             case R.id.actionLogout: {
@@ -375,6 +397,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return false;
             }
         }
+    }
+
+    private void closeNavDrawer() {
+        drawerLayout.closeDrawers();
     }
 
     private void openFeedbackBottomSheet() {
@@ -431,7 +457,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void logout() {
-        firebaseAuth.signOut();
+        AuthUI
+                .getInstance()
+                .signOut(this)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "logout: Signed out");
+                    } else {
+                        Log.d(TAG, "logout: Failed to sign out -> " + task.getException().getMessage());
+                    }
+                })
+        ;
         finish();
     }
 

@@ -81,7 +81,7 @@ public class BookMarkFragment extends Fragment {
 
             firebaseFirestore
                     .collection("Hostels")
-                    .whereArrayContains("bookmarks", currentUser.getUid())
+                    .whereArrayContains("bookMarks", currentUser.getUid())
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
                         public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -100,6 +100,7 @@ public class BookMarkFragment extends Fragment {
                                                 Log.d(TAG, "onEvent: Listing -> " + hostelObject.toString());
                                             }
                                         }
+                                        Log.d(TAG, "onEvent: BookMarks -> " + bookmarkList);
                                     }
                                 } else {
                                     new AlertDialog

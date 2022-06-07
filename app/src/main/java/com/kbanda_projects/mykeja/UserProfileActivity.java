@@ -47,7 +47,7 @@ public class UserProfileActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_SELECT_PROFILE_IMAGE = 32;
     private User user;
 
-    //TODO: Select profile image
+    //TODO: Compress image before upload.
 
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;

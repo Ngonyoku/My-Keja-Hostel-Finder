@@ -183,7 +183,7 @@ public class HomeFragment extends Fragment {
                                             Hostel hostelObject = documentChange.getDocument().toObject(Hostel.class);
                                             hostelObject.setDocumentId(documentChange.getDocument().getId());
                                             hostelList.add(hostelObject);
-//                                            recyclerViewAdapter.notifyDataSetChanged();
+
                                             recyclerViewAdapter.notifyDataSetChanged();
                                             Log.d(TAG, "onEvent: Listing -> " + hostelObject.toString());
                                         }

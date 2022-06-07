@@ -19,6 +19,11 @@
                     android:icon="@drawable/ic_people"
                     android:title="Manage Landlords"
                     app:showAsAction="ifRoom|withText" />
+                <item
+                    android:id="@+id/actionManageFeedback"
+                    android:icon="@drawable/ic_feed"
+                    android:title="Manage Feedback"
+                    app:showAsAction="ifRoom|withText" />
             </menu>
         </item>
     </group>
