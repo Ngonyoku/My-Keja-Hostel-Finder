@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#78C3FF</color>
-    <color name="purple_500">#2196F3</color>
-    <color name="purple_700">#005293</color>
-    <color name="teal_200">#FFC107</color>
-    <color name="teal_700">#B88A00</color>
+    <color name="purple_200">#E966FF</color>
+    <color name="purple_500">#9C27B0</color>
+    <color name="purple_700">#6B007E</color>
+    <color name="teal_200">#FF5722</color>
+    <color name="teal_700">#D53300</color>
     <color name="black">#FF000000</color>
     <color name="whatsapp_green">#25D366</color>
     <color name="white">#FFFFFFFF</color>

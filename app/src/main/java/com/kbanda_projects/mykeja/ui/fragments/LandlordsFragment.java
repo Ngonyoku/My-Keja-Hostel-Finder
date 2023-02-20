@@ -1,4 +1,4 @@
-package com.kbanda_projects.mykeja.fragments;
+package com.kbanda_projects.mykeja.ui.fragments;
 
 import android.app.AlertDialog;
 import android.os.Bundle;

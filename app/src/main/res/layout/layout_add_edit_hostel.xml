@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_margin="8dp"
     android:orientation="vertical">
 
@@ -48,7 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_money"
-            android:hint="Rent per month"
+            android:hint="Monthly rent (in Ksh)"
             android:inputType="numberDecimal" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -108,5 +108,64 @@
         android:text="parking"
         android:textOff="No parking"
         android:textOn="has parking" />
+
+    <Button
+        android:id="@+id/selectLandlord"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Landlord" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/landlordCard"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/landLordProfileImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_user_placeholder" />
+
+        <TextView
+            android:id="@+id/landlordNameTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/landLordProfileImage"
+            app:layout_constraintTop_toTopOf="@+id/landLordProfileImage"
+            tools:text="Landlord Name" />
+
+        <TextView
+            android:id="@+id/landlordPhoneNumberTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:maxLines="1"
+            app:layout_constraintEnd_toEndOf="@+id/landlordNameTV"
+            app:layout_constraintStart_toStartOf="@+id/landlordNameTV"
+            app:layout_constraintTop_toBottomOf="@+id/landlordNameTV"
+            tools:text="0707670113" />
+
+        <TextView
+            android:id="@+id/landlordEmailTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="@+id/landlordPhoneNumberTV"
+            app:layout_constraintStart_toStartOf="@+id/landlordPhoneNumberTV"
+            app:layout_constraintTop_toBottomOf="@+id/landlordPhoneNumberTV"
+            tools:text="kbanda.official@gmail.com" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

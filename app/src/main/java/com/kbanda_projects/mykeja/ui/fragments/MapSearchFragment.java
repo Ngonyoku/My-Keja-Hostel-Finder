@@ -1,4 +1,4 @@
-package com.kbanda_projects.mykeja.fragments;
+package com.kbanda_projects.mykeja.ui.fragments;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -46,7 +45,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.kbanda_projects.mykeja.HostelDetailsActivity;
+import com.kbanda_projects.mykeja.ui.HostelDetailsActivity;
 import com.kbanda_projects.mykeja.R;
 import com.kbanda_projects.mykeja.models.Hostel;
 

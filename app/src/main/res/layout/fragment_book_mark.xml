@@ -4,7 +4,7 @@
     android:id="@+id/bookMarkRecyclerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.BookMarkFragment"
+    tools:context=".ui.fragments.BookMarkFragment"
     tools:listitem="@layout/item_hostel_bookmarks">
 
 </androidx.recyclerview.widget.RecyclerView>

@@ -23,31 +23,31 @@
         android:theme="@style/Theme.MyKeja"
         tools:replace="android:theme">
         <activity
-            android:name=".AdminAddEditHostel"
+            android:name=".ui.AdminAddEditHostel"
             android:exported="false"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".UserProfileActivity"
+            android:name=".ui.UserProfileActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ImageSliderActivity"
+            android:name=".ui.ImageSliderActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".HostelDetailsActivity"
+            android:name=".ui.HostelDetailsActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}" />
+            android:value="AIzaSyDIOqUVovMgJmB6jq84nq0KHnYG4NYYRtQ" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>

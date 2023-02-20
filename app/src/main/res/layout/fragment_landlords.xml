@@ -4,7 +4,7 @@
     android:id="@+id/landLordRecyclerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.LandlordsFragment"
+    tools:context=".ui.fragments.LandlordsFragment"
     tools:listitem="@layout/item_landlords">
 
 </androidx.recyclerview.widget.RecyclerView>

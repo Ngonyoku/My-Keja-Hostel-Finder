@@ -1,4 +1,4 @@
-package com.kbanda_projects.mykeja;
+package com.kbanda_projects.mykeja.ui;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -9,10 +9,8 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +27,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
@@ -36,12 +35,13 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.kbanda_projects.mykeja.R;
 import com.kbanda_projects.mykeja.databinding.ActivityMainBinding;
-import com.kbanda_projects.mykeja.fragments.BookMarkFragment;
-import com.kbanda_projects.mykeja.fragments.HomeFragment;
-import com.kbanda_projects.mykeja.fragments.LandlordsFragment;
-import com.kbanda_projects.mykeja.fragments.ManageFeedbackFragment;
-import com.kbanda_projects.mykeja.fragments.MapSearchFragment;
+import com.kbanda_projects.mykeja.ui.fragments.BookMarkFragment;
+import com.kbanda_projects.mykeja.ui.fragments.HomeFragment;
+import com.kbanda_projects.mykeja.ui.fragments.LandlordsFragment;
+import com.kbanda_projects.mykeja.ui.fragments.ManageFeedbackFragment;
+import com.kbanda_projects.mykeja.ui.fragments.MapSearchFragment;
 import com.kbanda_projects.mykeja.models.User;
 
 import java.io.Serializable;
@@ -71,12 +71,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private HomeFragment homeFragment;
     private MapSearchFragment mapSearchFragment;
     private BookMarkFragment bookMarkFragment;
-    public static final int RC_SIGN_IN = 145;
+    public static final int RC_SIGN_IN = 95;
     private FirebaseUser currentUser;
     private FirebaseFirestore firebaseFirestore;
     private User currentUserObject;
     private LandlordsFragment landlordsFragment;
     private ProgressDialog progressDialog;
+    private BottomNavigationView bottomNavigation;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -97,6 +98,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         replaceFragment(homeFragment);
 
+        bottomNavigation = findViewById(R.id.bottomNavigationView);
+
         drawerLayout = activityMainBinding.drawerLayout;
         navigationView = activityMainBinding.mainNavigationView;
 
@@ -113,6 +116,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarDrawerToggle
                 .syncState();
         navigationView.setNavigationItemSelectedListener(this);
+        bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.actionHome: {
+                        replaceFragment(homeFragment);
+                        closeNavDrawer();
+                        return true;
+                    }
+                    case R.id.actionMapSearch: {
+                        replaceFragment(mapSearchFragment);
+                        closeNavDrawer();
+                        return true;
+                    }
+                    case R.id.actionBookMark: {
+                        replaceFragment(bookMarkFragment);
+                        closeNavDrawer();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
         authStateListener = firebaseAuth -> {
             currentUser = firebaseAuth.getCurrentUser();
@@ -211,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                                 String userRole = currentUserObject.getRole();
                                 if (userRole != null) {
-                                    if (userRole.equals("ADMIN")) {
+                                    if (userRole.equalsIgnoreCase("admin")) {
                                         navigationView.getMenu().setGroupVisible(R.id.navigationGroupAdmin, true);
                                     } else {
                                         navigationView.getMenu().setGroupVisible(R.id.navigationGroupAdmin, false);
@@ -280,7 +306,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .setPositiveButton("Complete", ((dialogInterface, i) -> {
                             openUserProfileActivity();
                         }))
-                        .setCancelable(false)
                         .create()
                         .show()
                 ;
@@ -339,21 +364,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.actionHome: {
-                replaceFragment(homeFragment);
-                closeNavDrawer();
-                return true;
-            }
-            case R.id.actionMapSearch: {
-                replaceFragment(mapSearchFragment);
-                closeNavDrawer();
-                return true;
-            }
-            case R.id.actionBookMark: {
-                replaceFragment(bookMarkFragment);
-                closeNavDrawer();
-                return true;
-            }
+//            case R.id.actionHome: {
+//                replaceFragment(homeFragment);
+//                closeNavDrawer();
+//                return true;
+//            }
+//            case R.id.actionMapSearch: {
+//                replaceFragment(mapSearchFragment);
+//                closeNavDrawer();
+//                return true;
+//            }
+//            case R.id.actionBookMark: {
+//                replaceFragment(bookMarkFragment);
+//                closeNavDrawer();
+//                return true;
+//            }
             case R.id.actionProfile: {
                 openUserProfileActivity();
                 closeNavDrawer();

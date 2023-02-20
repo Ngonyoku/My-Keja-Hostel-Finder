@@ -1,4 +1,4 @@
-package com.kbanda_projects.mykeja;
+package com.kbanda_projects.mykeja.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,6 +34,7 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.kbanda_projects.mykeja.R;
 import com.kbanda_projects.mykeja.databinding.ActivityUserProfileBinding;
 import com.kbanda_projects.mykeja.models.User;
 

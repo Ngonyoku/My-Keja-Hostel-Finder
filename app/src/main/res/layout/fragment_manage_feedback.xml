@@ -4,5 +4,5 @@
     android:id="@+id/feedbackRecyclerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.ManageFeedbackFragment"
+    tools:context=".ui.fragments.ManageFeedbackFragment"
     tools:listitem="@layout/item_feedback" />

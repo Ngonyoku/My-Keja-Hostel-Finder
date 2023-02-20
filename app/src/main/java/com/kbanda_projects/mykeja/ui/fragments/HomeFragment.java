@@ -1,4 +1,4 @@
-package com.kbanda_projects.mykeja.fragments;
+package com.kbanda_projects.mykeja.ui.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -21,29 +21,20 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.kbanda_projects.mykeja.AdminAddEditHostel;
-import com.kbanda_projects.mykeja.HostelDetailsActivity;
+import com.kbanda_projects.mykeja.ui.HostelDetailsActivity;
 import com.kbanda_projects.mykeja.R;
-import com.kbanda_projects.mykeja.UserProfileActivity;
 import com.kbanda_projects.mykeja.adapters.HostelRecyclerViewAdapter;
 import com.kbanda_projects.mykeja.models.Hostel;
-import com.kbanda_projects.mykeja.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
@@ -70,40 +61,40 @@ public class HomeFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.hostels_toolbar, menu);
         MenuItem searchViewItem = menu.findItem(R.id.actionSearchHostel);
-        SearchView searchView = (SearchView) searchViewItem.getActionView();
-        searchView.setQueryHint("Search Hostel...");
-        searchView
-                .setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                    @Override
-                    public boolean onQueryTextSubmit(String s) {
-                        List<Hostel> searchHostelResults = new ArrayList<>();
-                        if (!s.trim().isEmpty()) {
-                            if (!hostelList.isEmpty()) {
-                                for (Hostel hostel : hostelList) {
-                                    if (hostel.getTags().contains(s)) {
-                                        searchHostelResults.add(hostel);
-                                    }
-                                }
-
-                                hostelList.clear();
-                                if (!searchHostelResults.isEmpty()) {
-                                    for (Hostel hostel : searchHostelResults) {
-                                        hostelList.add(hostel);
-                                        recyclerViewAdapter.notifyDataSetChanged();
-                                    }
-                                }
-                            }
-                        } else {
-                            Toast.makeText(requireActivity(), "Nothing to search", Toast.LENGTH_SHORT).show();
-                        }
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onQueryTextChange(String s) {
-                        return false;
-                    }
-                });
+//        SearchView searchView = (SearchView) searchViewItem.getActionView();
+//        searchView.setQueryHint("Search Hostel...");
+//        searchView
+//                .setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//                    @Override
+//                    public boolean onQueryTextSubmit(String s) {
+//                        List<Hostel> searchHostelResults = new ArrayList<>();
+//                        if (!s.trim().isEmpty()) {
+//                            if (!hostelList.isEmpty()) {
+//                                for (Hostel hostel : hostelList) {
+//                                    if (hostel.getTags().contains(s)) {
+//                                        searchHostelResults.add(hostel);
+//                                    }
+//                                }
+//
+//                                hostelList.clear();
+//                                if (!searchHostelResults.isEmpty()) {
+//                                    for (Hostel hostel : searchHostelResults) {
+//                                        hostelList.add(hostel);
+//                                        recyclerViewAdapter.notifyDataSetChanged();
+//                                    }
+//                                }
+//                            }
+//                        } else {
+//                            Toast.makeText(requireActivity(), "Nothing to search", Toast.LENGTH_SHORT).show();
+//                        }
+//                        return true;
+//                    }
+//
+//                    @Override
+//                    public boolean onQueryTextChange(String s) {
+//                        return false;
+//                    }
+//                });
         super.onCreateOptionsMenu(menu, inflater);
     }
 

@@ -3,17 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/homeFragment"
+        android:id="@+id/actionHome"
         android:icon="@drawable/ic_home"
         android:title="Home"
         app:showAsAction="always|withText" />
     <item
-        android:id="@+id/mapSearchFragment"
+        android:id="@+id/actionMapSearch"
         android:icon="@drawable/ic_map"
         android:title="Find Hostel"
         app:showAsAction="always|withText" />
     <item
-        android:id="@+id/bookMarkFragment"
+        android:id="@+id/actionBookMark"
         android:icon="@drawable/ic_bookmark"
         android:title="Bookmarks"
         app:showAsAction="always|withText" />

@@ -31,25 +31,25 @@
     <group
         android:id="@+id/navigationGroup"
         android:checkableBehavior="single">
-        <item android:title="Navigation">
-            <menu>
-                <item
-                    android:id="@+id/actionHome"
-                    android:icon="@drawable/ic_home"
-                    android:title="Home"
-                    app:showAsAction="ifRoom|withText" />
-                <item
-                    android:id="@+id/actionMapSearch"
-                    android:icon="@drawable/ic_gps"
-                    android:title="Map Search"
-                    app:showAsAction="ifRoom|withText" />
-                <item
-                    android:id="@+id/actionBookMark"
-                    android:icon="@drawable/ic_bookmark"
-                    android:title="BookMarks"
-                    app:showAsAction="ifRoom|withText" />
-            </menu>
-        </item>
+<!--        <item android:title="Navigation">-->
+<!--            <menu>-->
+<!--                <item-->
+<!--                    android:id="@+id/actionHome"-->
+<!--                    android:icon="@drawable/ic_home"-->
+<!--                    android:title="Home"-->
+<!--                    app:showAsAction="ifRoom|withText" />-->
+<!--                <item-->
+<!--                    android:id="@+id/actionMapSearch"-->
+<!--                    android:icon="@drawable/ic_gps"-->
+<!--                    android:title="Map Search"-->
+<!--                    app:showAsAction="ifRoom|withText" />-->
+<!--                <item-->
+<!--                    android:id="@+id/actionBookMark"-->
+<!--                    android:icon="@drawable/ic_bookmark"-->
+<!--                    android:title="BookMarks"-->
+<!--                    app:showAsAction="ifRoom|withText" />-->
+<!--            </menu>-->
+<!--        </item>-->
         <item
             android:id="@+id/actionFeedback"
             android:icon="@drawable/ic_feedback"

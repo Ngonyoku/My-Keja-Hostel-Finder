@@ -1,8 +1,9 @@
-package com.kbanda_projects.mykeja;
+package com.kbanda_projects.mykeja.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,7 +11,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,10 +26,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,21 +41,27 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.kbanda_projects.mykeja.R;
 import com.kbanda_projects.mykeja.adapters.HostelImagesRecyclerViewAdapter;
+import com.kbanda_projects.mykeja.adapters.LandLordListAdapter;
 import com.kbanda_projects.mykeja.models.Hostel;
+import com.kbanda_projects.mykeja.models.User;
 
 import java.io.File;
 import java.io.Serializable;
@@ -65,6 +71,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -97,6 +104,16 @@ public class AdminAddEditHostel extends AppCompatActivity {
     private String[] roomTypes;
     private TextView latitudeTV;
     private TextView longitudeTV;
+    private Button selectLandlordBtn;
+    private List<User> landLordList;
+    private String landLordId = null;
+    private LandLordListAdapter adapter;
+    private RecyclerView landlordRecyclerView;
+    private BottomSheetDialog bottomSheetDialog;
+    private CircleImageView profileImage;
+    private TextView landLordName;
+    private TextView landLordEmail;
+    private TextView landLordPhone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +134,11 @@ public class AdminAddEditHostel extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
 
         imagesRecyclerView = findViewById(R.id.hostelImageRecyclerView);
+        profileImage = findViewById(R.id.landLordProfileImage);
+        landLordName = findViewById(R.id.landlordNameTV);
+        landLordEmail = findViewById(R.id.landlordEmailTV);
+        landLordPhone = findViewById(R.id.landlordPhoneNumberTV);
+
         hostelNameTIL = findViewById(R.id.hostelNameTIL);
         hostelDescriptionTIL = findViewById(R.id.hostelDescriptionTIL);
         hostelRentTIL = findViewById(R.id.hostelRentPriceTIL);
@@ -125,11 +147,36 @@ public class AdminAddEditHostel extends AppCompatActivity {
         roomTypeAutoCompleteTV = findViewById(R.id.roomTypeAutoTV);
         latitudeTV = findViewById(R.id.latitudeTV);
         longitudeTV = findViewById(R.id.longitudeTV);
+        selectLandlordBtn = findViewById(R.id.selectLandlord);
         locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 //        roomTypeSpinner = findViewById(R.id.roomTypeSpinner);
 
+        bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.layout_landlord_list);
+        landlordRecyclerView = bottomSheetDialog.findViewById(R.id.landlordList);
+
         hostelImageList = new ArrayList<>();
         imagesRecyclerViewAdapter = new HostelImagesRecyclerViewAdapter(hostelImageList, this);
+        landLordList = new ArrayList<>();
+        selectLandlordBtn
+                .setOnClickListener(v -> {
+                    selectLandLord();
+                })
+        ;
+        landlordRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        adapter = new LandLordListAdapter(this, landLordList);
+
+        adapter.setOnLandLordClickedListener(
+                position -> {
+                    User landLord = landLordList.get(position);
+                    Log.d(TAG, "onCreate: User selected ID -> " + landLord.getUserId());
+                    displayLandLord(landLord);
+                    bottomSheetDialog.dismiss();
+                }
+        );
+
+        landlordRecyclerView.setAdapter(adapter);
+        landlordRecyclerView.setHasFixedSize(true);
 
         imagesRecyclerView.setHasFixedSize(true);
         imagesRecyclerView.setLayoutManager(new LinearLayoutManager(
@@ -169,6 +216,64 @@ public class AdminAddEditHostel extends AppCompatActivity {
                 Toast.makeText(AdminAddEditHostel.this, "Item: " + roomTypes[i], Toast.LENGTH_SHORT).show();
             }
         });
+
+        fetchLandLords();
+    }
+
+    private void displayLandLord(User landLord) {
+        if (landLord != null) {
+            landLordId = landLord.getUserId();
+            landLordName.setText(landLord.getFirstName() + " " + landLord.getLastName());
+            landLordEmail.setText(landLord.getEmail());
+            landLordPhone.setText(landLord.getPhoneNumber());
+            ConstraintLayout layout = findViewById(R.id.landlordCard);
+            layout.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+    private void selectLandLord() {
+        bottomSheetDialog.create();
+        bottomSheetDialog.show();
+    }
+
+    private void fetchLandLords() {
+        if (currentUser != null) {
+            Log.d(TAG, "fetchLandLords: Fetching landlords...");
+            firebaseFirestore
+                    .collection("Users")
+                    .whereEqualTo("role", "LANDLORD")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            if (error == null) {
+                                if (value != null) {
+                                    if (!value.isEmpty()) {
+                                        landLordList.clear();
+                                        for (DocumentChange documentChange : value.getDocumentChanges()) {
+                                            if (documentChange.getType() == DocumentChange.Type.ADDED) {
+                                                User user = documentChange.getDocument().toObject(User.class);
+                                                landLordList.add(user);
+                                                adapter.notifyItemInserted(landLordList.size() + 1);
+                                                Log.d(TAG, "onEvent: Landlords Added -> " + user);
+                                            }
+                                        }
+                                    } else {
+                                        Log.d(TAG, "onEvent: Could NOT add landlord");
+//                                        new AlertDialog.Builder(requireActivity())
+//                                                .setTitle("Error")
+//                                                .setMessage("No landlords available")
+//                                                .create()
+//                                                .show()
+//                                        ;
+                                        Toast.makeText(AdminAddEditHostel.this, "No Landlords available", Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            }
+                        }
+                    })
+            ;
+        }
     }
 
     private boolean isNetworkAvailable() {
@@ -277,26 +382,38 @@ public class AdminAddEditHostel extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionSaveHostel: {
-                String name = hostelNameTIL.getEditText().getText().toString();
-                String description = hostelDescriptionTIL.getEditText().getText().toString();
-                String rentPrice = hostelRentTIL.getEditText().getText().toString();
-                String latitude = latitudeTV.getText().toString();
-                String longitude = longitudeTV.getText().toString();
-                Map<String, String> locationInfo = new HashMap<>();
-                locationInfo.put("latitude", latitude);
-                locationInfo.put("longitude", longitude);
-                Hostel hostel = new Hostel();
-                hostel.setName(name);
-                hostel.setDescription(description);
-                hostel.setRentPricePerMonth(rentPrice);
-                hostel.setRatings("0");
-                hostel.setHasParking(hasParkingSwitch.isChecked());
-                hostel.setHasWifi(hasWifiSwitch.isChecked());
-                hostel.setLocationInfo(locationInfo);
-                hostel.setTotalRoomsAvailable("0");
+                if (landLordId != null) {
+                    String name = hostelNameTIL.getEditText().getText().toString();
+                    String description = hostelDescriptionTIL.getEditText().getText().toString();
+                    String rentPrice = hostelRentTIL.getEditText().getText().toString();
+                    String latitude = latitudeTV.getText().toString();
+                    String longitude = longitudeTV.getText().toString();
+                    Map<String, String> locationInfo = new HashMap<>();
+                    locationInfo.put("latitude", latitude);
+                    locationInfo.put("longitude", longitude);
+                    Hostel hostel = new Hostel();
+                    hostel.setName(name);
+                    hostel.setDescription(description);
+                    hostel.setRentPricePerMonth(rentPrice);
+                    hostel.setRatings("0");
+                    hostel.setHasParking(hasParkingSwitch.isChecked());
+                    hostel.setHasWifi(hasWifiSwitch.isChecked());
+                    hostel.setLocationInfo(locationInfo);
+                    hostel.setTotalRoomsAvailable("");
+                    hostel.setTags(Arrays.asList(name, name.toUpperCase(), name.toLowerCase()));
+                    hostel.setOwnerId(landLordId);
 
-                hostel.setTags(Arrays.asList(name, name.toUpperCase(), name.toLowerCase()));
-                saveHostel(hostel);
+
+                    saveHostel(hostel);
+
+                } else {
+                    new AlertDialog.Builder(this)
+                            .setTitle("Missing Contact")
+                            .setMessage("Please select LandLord")
+                            .create()
+                            .show()
+                    ;
+                }
                 return true;
             }
             case R.id.actionDeleteHostel: {
@@ -385,70 +502,69 @@ public class AdminAddEditHostel extends AppCompatActivity {
 
     private void saveHostel(Hostel hostel) {
         if (currentUser != null) {
-            if (currentHostelFromIntent != null) {
-
-            } else {
-                hostel.setOwnerId(currentUser.getUid());
-                progressDialog.setTitle("Saving");
-                progressDialog.setMessage("Saving hostel details");
-                progressDialog.setCancelable(false);
-                progressDialog.create();
-                progressDialog.show();
-                firebaseFirestore
-                        .collection("Hostels")
-                        .add(hostel)
-                        .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentReference> task) {
+            hostel.setOwnerId(currentUser.getUid());
+            progressDialog.setTitle("Saving");
+            progressDialog.setMessage("Saving hostel details");
+            progressDialog.setCancelable(false);
+            progressDialog.create();
+            progressDialog.show();
+            firebaseFirestore
+                    .collection("Hostels")
+                    .add(hostel)
+                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentReference> task) {
 //                                progressDialog.dismiss();
-                                if (task.isSuccessful()) {
-                                    Log.d(TAG, "onComplete: Saved hostel successfully");
-                                    saveImagesToFirebase(task.getResult());
-//                                    Toast.makeText(AdminAddEditHostel.this, "Saved sucessfully", Toast.LENGTH_SHORT).show();
-//                                    finish();
-                                } else {
-                                    Log.d(TAG, "onComplete: Failed to save hostel");
-                                }
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "onComplete: Saved hostel successfully");
+                                saveImagesToFirebase(task.getResult());
+                                Toast.makeText(AdminAddEditHostel.this, "Saved sucessfully", Toast.LENGTH_SHORT).show();
+//                                finish();
+                            } else {
+                                Log.d(TAG, "onComplete: Failed to save hostel");
                             }
-                        })
-                        .addOnFailureListener(Throwable::printStackTrace)
-                ;
-            }
+                        }
+                    })
+                    .addOnFailureListener(Throwable::printStackTrace)
+            ;
         }
     }
 
+
     private void saveImagesToFirebase(DocumentReference result) {
-        if (currentUser != null) {
-            if (result != null) {
-                if (hostelImageList != null && !hostelImageList.isEmpty()) {
-                    for (int i = 0; i < hostelImageList.size(); i++) {
-                        String hostelsId = result.getId();
-                        Uri imageUri = Uri.fromFile(new File(hostelImageList.get(i)));
-                        final StorageReference reference = userRootStorageReference
-                                .child("hostels")
-                                .child(hostelsId)
-                                .child(System.currentTimeMillis() + ".Kbanda");
-                        Log.d(TAG, "saveImagesToFirebase: Image File Extension ");
-                        UploadTask uploadTask = reference.putFile(imageUri);
-                        Task<Uri> objectTask = uploadTask
-                                .continueWithTask(task -> {
-                                    if (!task.isSuccessful()) throw task.getException();
-                                    return reference.getDownloadUrl();
-                                })
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        Log.d(TAG, "saveImagesToFirebase: Image saved successfully");
-                                        String url = task.getResult().toString();
-                                        result.update("imageUrls", Arrays.asList(url));
-                                    } else {
-                                        Log.d(TAG, "saveImagesToFirebase: Failed to save image");
-                                        progressDialog.dismiss();
-                                    }
-                                });
-                        // {uID}/hostels/{hostelId}/images
-                    }
-                    progressDialog.dismiss();
+
+        if (result != null) {
+            if (hostelImageList != null && !hostelImageList.isEmpty()) {
+                for (int i = 0; i < hostelImageList.size(); i++) {
+                    String hostelsId = result.getId();
+                    Uri imageUri = Uri.fromFile(new File(hostelImageList.get(i)));
+                    final StorageReference reference = userRootStorageReference
+                            .child("hostels")
+                            .child(System.currentTimeMillis() + ".Kbanda");
+                    Log.d(TAG, "saveImagesToFirebase: Image File Extension ");
+                    UploadTask uploadTask = reference.putFile(imageUri);
+                    Task<Uri> objectTask = uploadTask
+                            .continueWithTask(task -> {
+                                if (!task.isSuccessful()) throw task.getException();
+                                return reference.getDownloadUrl();
+                            })
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "saveImagesToFirebase: Image saved successfully");
+                                    String url = task.getResult().toString();
+                                    result.update("imageUrls", Arrays.asList(url));
+                                    progressDialog.dismiss();
+                                    finish();
+                                } else {
+                                    Log.d(TAG, "saveImagesToFirebase: Failed to save image");
+                                    progressDialog.dismiss();
+                                }
+                            });
+                    // {uID}/hostels/{hostelId}/images
                 }
+            } else {
+                Toast.makeText(this, "No Images selected!", Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
             }
         }
     }

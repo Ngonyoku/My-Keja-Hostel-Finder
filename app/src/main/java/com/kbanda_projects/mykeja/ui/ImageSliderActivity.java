@@ -1,10 +1,11 @@
-package com.kbanda_projects.mykeja;
+package com.kbanda_projects.mykeja.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 
+import com.kbanda_projects.mykeja.R;
 import com.kbanda_projects.mykeja.adapters.ImageSliderViewPagerAdapter;
 
 import java.util.List;

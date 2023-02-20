@@ -1,4 +1,4 @@
-package com.kbanda_projects.mykeja;
+package com.kbanda_projects.mykeja.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,20 +15,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.chip.Chip;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
+import com.kbanda_projects.mykeja.R;
 import com.kbanda_projects.mykeja.adapters.HostelImagesRecyclerViewAdapter;
 import com.kbanda_projects.mykeja.models.Hostel;
 import com.kbanda_projects.mykeja.models.User;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
